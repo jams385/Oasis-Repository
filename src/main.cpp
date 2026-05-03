@@ -3,7 +3,7 @@
 int main()
 {
 	//initializes the window
-    sf::Window window(sf::VideoMode(800, 600), "My window");
+    sf::Window window(sf::VideoMode(800, 600), "Oasis");
 
     // run the program as long as the window is open
     while (window.isOpen())

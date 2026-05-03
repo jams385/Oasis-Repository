@@ -3,7 +3,14 @@ project(Oasis)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-find_package(SFML 2.6 COMPONENTS graphics window system audio REQUIRED)
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.1
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(SFML)
 
 add_executable(Oasis src/main.cpp)
 target_compile_features(Oasis PRIVATE cxx_std_17)
