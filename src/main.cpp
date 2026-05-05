@@ -85,7 +85,12 @@ int main() {
 
         // UPDATES HUD
         if (state == GameState::Playing) {
-             hud.update(DeltaTime, waterPoints, waveNumber, false);
+            hud.update(DeltaTime, waterPoints, waveNumber, false);
+
+            if (hud.cycleJustCompleted()) {
+                waveNumber++;
+                hud.update(DeltaTime, waterPoints, waveNumber, true);
+            }
         }
         
         // RENDER

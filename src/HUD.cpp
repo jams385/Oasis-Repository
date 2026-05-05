@@ -2,10 +2,10 @@
 #include <sstream>
 
 // ── Button layout constants ───────────────────────────────────────────────────
-const float BTN_WIDTH    = 110.f;
-const float BTN_HEIGHT   = 70.f;
-const float BTN_PADDING  = 12.f;
-const float BTN_Y_OFFSET = 20.f;  // how far from bottom of screen
+const float BTN_WIDTH   = 110.f;
+const float BTN_HEIGHT  = 70.f;
+const float BTN_PADDING = 12.f;
+const float BTN_Y_OFFSET = 20.f;
 
 // ── Constructor ───────────────────────────────────────────────────────────────
 HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
@@ -16,12 +16,12 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     currencyText.setCharacterSize(22);
     currencyText.setFillColor(sf::Color::Cyan);
 
-    // Wave text - top middle (small, always visible)
+    // Small wave label - top middle
     waveText.setFont(font);
     waveText.setCharacterSize(20);
     waveText.setFillColor(sf::Color::White);
 
-    // Wave announcement - top middle (big, flashes on new wave)
+    // Big wave announcement - flashes on new wave
     waveAnnouncement.setFont(font);
     waveAnnouncement.setCharacterSize(52);
     waveAnnouncement.setFillColor(sf::Color::Yellow);
@@ -33,11 +33,11 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     dayNightBg.setOutlineThickness(1.5f);
     dayNightBg.setPosition(20.f, windowHeight - 50.f);
 
-    // Day/night bar fill
+    // Day/night bar fill (starts empty)
     dayNightBar.setSize({ 0.f, 18.f });
     dayNightBar.setPosition(20.f, windowHeight - 50.f);
 
-    // Day/night label
+    // Day/night label above the bar
     dayNightLabel.setFont(font);
     dayNightLabel.setCharacterSize(16);
     dayNightLabel.setFillColor(sf::Color::White);
@@ -48,15 +48,20 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
 
 // ── Build structure buttons ───────────────────────────────────────────────────
 void HUD::buildButtons() {
-    // Define the 3 towers
-    struct ButtonDef { SelectedTower type; std::string name; int cost; sf::Color color; };
-    std::vector<ButtonDef> defs = {
-        { SelectedTower::WaterTower, "Water\nTower",  50,  sf::Color(30, 100, 200)  },
-        { SelectedTower::SunBeam,    "Sun\nBeam",     100, sf::Color(200, 160, 30)  },
-        { SelectedTower::TreeTower,  "Tree\nTower",   75,  sf::Color(34, 120, 34)   },
+    struct ButtonDef {
+        SelectedTower type;
+        std::string   name;
+        int           cost;
+        sf::Color     color;
     };
 
-    // Center the button row at the bottom middle
+    std::vector<ButtonDef> defs = {
+        { SelectedTower::WaterTower, "Water\nTower", 50,  sf::Color(30, 100, 200) },
+        { SelectedTower::SunBeam,    "Sun\nBeam",    100, sf::Color(200, 160, 30) },
+        { SelectedTower::TreeTower,  "Tree\nTower",  75,  sf::Color(34, 120, 34)  },
+    };
+
+    // Center the row at the bottom middle of the screen
     float totalWidth = defs.size() * BTN_WIDTH + (defs.size() - 1) * BTN_PADDING;
     float startX     = (windowWidth - totalWidth) / 2.f;
     float y          = windowHeight - BTN_HEIGHT - BTN_Y_OFFSET;
@@ -86,7 +91,7 @@ void HUD::buildButtons() {
         btn.costText.setFillColor(sf::Color(200, 230, 255));
         btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
 
-        // Select the first button by default
+        // First button selected by default
         btn.selected = (i == 0);
 
         buttons.push_back(btn);
@@ -98,25 +103,28 @@ void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave) {
     this->waterPoints = waterPoints;
     this->waveNumber  = waveNumber;
 
-    // Trigger announcement when a new wave starts
     if (newWave) announcementTimer = 2.5f;
-
-    // Count announcement down
     if (announcementTimer > 0.f) announcementTimer -= dt;
 
-    // Tick day/night
     tickDayNight(dt);
 }
 
-// ── Day/Night tick ────────────────────────────────────────────────────────────
+// ── Day/Night cycle ───────────────────────────────────────────────────────────
 void HUD::tickDayNight(float dt) {
+    _cycleCompleted = false;  // reset every frame - only true for one frame
+
     dayNightProgress += dt / cycleDuration;
+
     if (dayNightProgress >= 1.f) {
         dayNightProgress = 0.f;
-        _isNight = !_isNight;   // flip day/night
+        _isNight = !_isNight;
+
+        // A full cycle completes when we flip back to day
+        if (!_isNight)
+            _cycleCompleted = true;
     }
 
-    // Bar color: yellow during day, dark blue at night
+    // Bar color changes between day (yellow) and night (dark blue)
     sf::Color barColor = _isNight
         ? sf::Color(50, 50, 150)
         : sf::Color(240, 200, 50);
@@ -126,13 +134,13 @@ void HUD::tickDayNight(float dt) {
     dayNightLabel.setString(_isNight ? "Night" : "Day");
 }
 
-bool HUD::isNight() const { return _isNight; }
+bool HUD::isNight()            const { return _isNight; }
+bool HUD::cycleJustCompleted()       { return _cycleCompleted; }
 
-// ── Handle click on buttons ───────────────────────────────────────────────────
+// ── Handle button clicks ──────────────────────────────────────────────────────
 bool HUD::handleClick(sf::Vector2f mousePos) {
     for (auto& btn : buttons) {
         if (btn.shape.getGlobalBounds().contains(mousePos)) {
-            // Deselect all, select clicked
             for (auto& b : buttons) {
                 b.selected = false;
                 b.shape.setOutlineThickness(1.5f);
@@ -167,14 +175,14 @@ void HUD::drawCurrency(sf::RenderWindow& window) {
     ss << "Water: " << waterPoints;
     currencyText.setString(ss.str());
 
-    // Pin to top right
     float textWidth = currencyText.getLocalBounds().width;
     currencyText.setPosition(windowWidth - textWidth - 20.f, 14.f);
     window.draw(currencyText);
 }
 
+
 void HUD::drawWaveInfo(sf::RenderWindow& window) {
-    // Small persistent wave label top middle
+    // Small persistent label
     std::ostringstream ss;
     ss << "Wave " << waveNumber;
     waveText.setString(ss.str());
@@ -182,13 +190,13 @@ void HUD::drawWaveInfo(sf::RenderWindow& window) {
     waveText.setPosition((windowWidth - textWidth) / 2.f, 14.f);
     window.draw(waveText);
 
-    // Big announcement that fades after 2.5 seconds
+    // Big announcement that fades out
     if (announcementTimer > 0.f) {
         std::ostringstream as;
         as << "Wave " << waveNumber << "!";
         waveAnnouncement.setString(as.str());
 
-        // Fade out in last 1 second
+        // Fade out during the last 1 second
         int alpha = (announcementTimer < 1.f)
             ? (int)(255 * announcementTimer)
             : 255;

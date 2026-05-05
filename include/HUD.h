@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <vector>
 
 // Which tower the player currently has selected
 enum class SelectedTower {
@@ -16,13 +17,13 @@ public:
     void update(float dt, int waterPoints, int waveNumber, bool newWave);
     void draw(sf::RenderWindow& window);
 
-    // Returns which tower button was clicked, or -1 if none
     SelectedTower getSelectedTower() const;
-    bool handleClick(sf::Vector2f mousePos);  // returns true if a button was clicked
+    bool handleClick(sf::Vector2f mousePos);
 
     // Day/night cycle
     void tickDayNight(float dt);
     bool isNight() const;
+    bool cycleJustCompleted();  // returns true once per full cycle
 
 private:
     sf::Font&    font;
@@ -33,16 +34,17 @@ private:
     int          waterPoints = 0;
     sf::Text     currencyText;
 
-    // ── Wave announcement ─────────────────────────────────────────────────────
+    // ── Wave ──────────────────────────────────────────────────────────────────
     int          waveNumber  = 1;
-    float        announcementTimer = 0.f;  // counts down after a new wave starts
+    float        announcementTimer = 0.f;
     sf::Text     waveText;
     sf::Text     waveAnnouncement;
 
     // ── Day/Night bar ─────────────────────────────────────────────────────────
-    float        dayNightProgress = 0.f;   // 0.0 = start of day, 1.0 = end of night
-    float        cycleDuration    = 30.f;  // full day+night cycle in seconds
+    float        dayNightProgress = 0.f;
+    float        cycleDuration    = 30.f;  // seconds for a full day+night cycle
     bool         _isNight         = false;
+    bool         _cycleCompleted  = false; // true for one frame when cycle resets
     sf::RectangleShape dayNightBg;
     sf::RectangleShape dayNightBar;
     sf::Text           dayNightLabel;
