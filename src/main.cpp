@@ -1,19 +1,26 @@
 #include <iostream>
 #include <vector>
+#include <cstdlib>
 #include <SFML/Graphics.hpp>
 #include "HUD.h"
 #include "Map.h"
 #include "Tower.h"
-
-std::vector<Tower> towers;
+#include "Enemy.h"
+#include "EnemySpawner.h"
 
 using namespace std;
 
 /* read program documentation for explanations:
 https://docs.google.com/document/d/1sXYtkZC9QKFjfhb1YHDYnqGQbtqAIGhFicqRt7q9XC8/edit?tab=t.eynqtmny1yz4 */
 
+
 int WINDOW_WIDTH = 1280;
 int WINDOW_HEIGHT = 720;
+
+std::vector<Tower> towers;
+std::vector<Enemy> enemies;
+EnemySpawner spawner(WINDOW_WIDTH, WINDOW_HEIGHT);
+sf::Vector2f cornucopiaPos = { WINDOW_WIDTH/2.f, WINDOW_HEIGHT/2.f };
 
 enum class GameState{
     Menu,
@@ -108,12 +115,26 @@ int main() {
 
         // UPDATES HUD
         if (state == GameState::Playing) {
+
+            // For updating the hud
             hud.update(DeltaTime, waterPoints, waveNumber, false);
 
             if (hud.cycleJustCompleted()) {
                 waveNumber++;
                 hud.update(DeltaTime, waterPoints, waveNumber, true);
             }
+
+            //For updating the enemy spawn
+            spawner.update(DeltaTime, enemies);
+            for (auto& e : enemies){
+                e.update(DeltaTime, cornucopiaPos);
+            }
+
+            // removes dead enemies
+            enemies.erase(  std::remove_if(enemies.begin(), enemies.end(),
+                            [](const Enemy& e){return !e.isAlive(); }), 
+                            enemies.end()
+                        );
         }
         
         // RENDER
@@ -130,6 +151,7 @@ int main() {
         else if(state == GameState::Playing){
             map.draw(window, hoveredTile);
             for (auto& t : towers) t.draw(window);
+            for (auto& e : enemies) e.draw(window);
             hud.draw(window);
         }
  
