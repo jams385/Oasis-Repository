@@ -1,10 +1,11 @@
 #include <iostream>
+#include <vector>
 #include <SFML/Graphics.hpp>
-#include "Enemy.h"
-#include "Constants.h"
-#include "Tower.h"
-#include "Cornucopia.h"
 #include "HUD.h"
+#include "Map.h"
+#include "Tower.h"
+
+std::vector<Tower> towers;
 
 using namespace std;
 
@@ -53,6 +54,11 @@ int main() {
     int waterPoints = 150;
     int waveNumber = 1;
 
+    Map map;
+    map.loadFromFile("assets/map.txt");
+    sf::Vector2i hoveredTile = {-1, -1};
+
+
     GameState state = GameState::Menu;
 
     /* GAME LOOP */
@@ -81,6 +87,23 @@ int main() {
                 }
             }
 
+            if(event.type == sf::Event::MouseMoved){
+                hoveredTile = map.worldToGrid({(float)event.mouseMove.x, (float)event.mouseMove.y});
+            }
+
+            if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left){
+                sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+
+                if(!hud.handleClick(mousePos)){
+                    sf::Vector2i tile = map.worldToGrid(mousePos);
+
+                    if(map.isPlaceable(tile)){
+                        map.setTower(tile);
+                        towers.push_back(Tower(map.tileCenter(tile)));
+                    }
+                }
+            }
+
         }
 
         // UPDATES HUD
@@ -105,6 +128,8 @@ int main() {
         }
 
         else if(state == GameState::Playing){
+            map.draw(window, hoveredTile);
+            for (auto& t : towers) t.draw(window);
             hud.draw(window);
         }
  

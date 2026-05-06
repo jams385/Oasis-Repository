@@ -14,11 +14,9 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(Oasis
     src/main.cpp
-    src/Enemy.cpp
     src/Tower.cpp
-    src/WaveManager.cpp
-    src/Cornucopia.cpp
     src/HUD.cpp
+    src/Map.cpp
 )
 target_include_directories(Oasis PRIVATE include)
 target_compile_features(Oasis PRIVATE cxx_std_17)
