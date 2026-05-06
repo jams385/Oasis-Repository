@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-const sf::Color COLOR_EMPTY   = sf::Color( 70, 110,  60);
+const sf::Color COLOR_EMPTY   = sf::Color( 0, 0, 0);
 const sf::Color COLOR_BLOCKED = sf::Color( 40,  60,  40);
 const sf::Color COLOR_TOWER   = sf::Color( 50,  80,  60);
 const sf::Color COLOR_HOVER   = sf::Color(110, 160,  90);
