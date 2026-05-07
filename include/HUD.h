@@ -3,21 +3,23 @@
 #include <string>
 #include <vector>
 
-// Which tower the player currently has selected
+// Which structure the player currently has selected
 enum class SelectedTower {
     WaterTower,
     SunBeam,
-    TreeTower
+    TreeTower,
+    Cornucopia
 };
 
 class HUD {
 public:
     HUD(sf::Font& font, int windowWidth, int windowHeight);
 
-    void update(float dt, int waterPoints, int waveNumber, bool newWave);
+    void update(float dt, int waterPoints, int waveNumber, bool newWave, int cornucopiaCount);
     void draw(sf::RenderWindow& window);
 
     SelectedTower getSelectedTower() const;
+    int           getSelectedCost()  const;
     bool handleClick(sf::Vector2f mousePos);
 
     // Day/night cycle
@@ -33,6 +35,10 @@ private:
     // ── Currency ──────────────────────────────────────────────────────────────
     int          waterPoints = 0;
     sf::Text     currencyText;
+
+    // ── Cornucopia count ──────────────────────────────────────────────────────
+    int          cornucopiaCount = 0;
+    sf::Text     cornucopiaText;
 
     // ── Wave ──────────────────────────────────────────────────────────────────
     int          waveNumber  = 1;
@@ -66,4 +72,5 @@ private:
     void drawCurrency(sf::RenderWindow& window);
     void drawWaveInfo(sf::RenderWindow& window);
     void drawStructureButtons(sf::RenderWindow& window);
+    void drawCornucopiaCount(sf::RenderWindow& window);
 };

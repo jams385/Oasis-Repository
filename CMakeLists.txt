@@ -18,7 +18,8 @@ add_executable(Oasis
     src/HUD.cpp
     src/Map.cpp
     src/Enemy.cpp
-    src/EnemySpawner.cpp 
+    src/EnemySpawner.cpp
+    src/Cornucopia.cpp
 )
 target_include_directories(Oasis PRIVATE include)
 target_compile_features(Oasis PRIVATE cxx_std_17)

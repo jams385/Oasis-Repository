@@ -43,6 +43,12 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     dayNightLabel.setFillColor(sf::Color::White);
     dayNightLabel.setPosition(20.f, windowHeight - 74.f);
 
+    // Cornucopia count - top left
+    cornucopiaText.setFont(font);
+    cornucopiaText.setCharacterSize(20);
+    cornucopiaText.setFillColor(sf::Color(255, 215, 0));
+    cornucopiaText.setPosition(20.f, 14.f);
+
     buildButtons();
 }
 
@@ -56,9 +62,10 @@ void HUD::buildButtons() {
     };
 
     std::vector<ButtonDef> defs = {
-        { SelectedTower::WaterTower, "Water\nTower", 50,  sf::Color(30, 100, 200) },
-        { SelectedTower::SunBeam,    "Sun\nBeam",    100, sf::Color(200, 160, 30) },
-        { SelectedTower::TreeTower,  "Tree\nTower",  75,  sf::Color(34, 120, 34)  },
+        { SelectedTower::WaterTower, "Water\nTower",  50,  sf::Color(30, 100, 200)  },
+        { SelectedTower::SunBeam,    "Sun\nBeam",     100, sf::Color(200, 160, 30)  },
+        { SelectedTower::TreeTower,  "Tree\nTower",   75,  sf::Color(34, 120, 34)   },
+        { SelectedTower::Cornucopia, "Cornucopia",    200, sf::Color(160, 110, 10)  },
     };
 
     // Center the row at the bottom middle of the screen
@@ -99,9 +106,10 @@ void HUD::buildButtons() {
 }
 
 // ── Update ────────────────────────────────────────────────────────────────────
-void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave) {
-    this->waterPoints = waterPoints;
-    this->waveNumber  = waveNumber;
+void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int cornucopiaCount) {
+    this->waterPoints     = waterPoints;
+    this->waveNumber      = waveNumber;
+    this->cornucopiaCount = cornucopiaCount;
 
     if (newWave) announcementTimer = 2.5f;
     if (announcementTimer > 0.f) announcementTimer -= dt;
@@ -156,12 +164,19 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
 
 SelectedTower HUD::getSelectedTower() const { return selectedTower; }
 
+int HUD::getSelectedCost() const {
+    for (const auto& btn : buttons)
+        if (btn.type == selectedTower) return btn.cost;
+    return 0;
+}
+
 // ── Draw ──────────────────────────────────────────────────────────────────────
 void HUD::draw(sf::RenderWindow& window) {
     drawDayNightBar(window);
     drawCurrency(window);
     drawWaveInfo(window);
     drawStructureButtons(window);
+    drawCornucopiaCount(window);
 }
 
 void HUD::drawDayNightBar(sf::RenderWindow& window) {
@@ -214,4 +229,9 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
         window.draw(btn.nameText);
         window.draw(btn.costText);
     }
+}
+
+void HUD::drawCornucopiaCount(sf::RenderWindow& window) {
+    cornucopiaText.setString("Oasis: " + std::to_string(cornucopiaCount) + " / 5");
+    window.draw(cornucopiaText);
 }
