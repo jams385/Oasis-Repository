@@ -19,13 +19,13 @@ Cornucopia::Cornucopia(sf::Vector2f worldPos)
 
     // Triangle crown sitting on top of the body
     top.setPointCount(3);
-    top.setPoint(0, { 0.f,            -14.f });   // apex
-    top.setPoint(1, { -BODY_W / 2.f,   0.f  });   // bottom-left
-    top.setPoint(2, {  BODY_W / 2.f,   0.f  });   // bottom-right
+    top.setPoint(0, { 0.f,            -14.f }); 
+    top.setPoint(1, { -BODY_W / 2.f,   0.f  });   
+    top.setPoint(2, {  BODY_W / 2.f,   0.f  });  
     top.setFillColor(sf::Color(255, 215, 0));
     top.setOutlineColor(sf::Color(200, 160, 0));
     top.setOutlineThickness(1.5f);
-    // Place the triangle base flush with the top edge of the body
+   
     top.setPosition(position.x, position.y - BODY_H / 2.f);
 }
 

@@ -17,6 +17,8 @@ using namespace std;
 /* read program documentation for explanations and progress documentation:
 https://docs.google.com/document/d/1sXYtkZC9QKFjfhb1YHDYnqGQbtqAIGhFicqRt7q9XC8/edit?tab=t.eynqtmny1yz4 */
 
+/* INITIALIZING GLOBAL VARIABLES */
+
 const int WINDOW_WIDTH  = 1280;
 const int WINDOW_HEIGHT = 720;
 
@@ -25,51 +27,11 @@ std::vector<Enemy>      enemies;
 std::vector<Cornucopia> cornucopias;
 EnemySpawner            spawner(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+/* Function Prototypes */
 enum class GameState { Menu, Playing, Won, Lost };
-
-sf::Vector2f nearestCornucopia(const std::vector<Cornucopia>& cs, sf::Vector2f from) {
-    sf::Vector2f best = from;
-    float minDist = std::numeric_limits<float>::max();
-    for (const auto& c : cs) {
-        if (c.isDestroyed()) continue;
-        sf::Vector2f d = c.getPosition() - from;
-        float dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; best = c.getPosition(); }
-    }
-    return best;
-}
-
-// Returns the index into `cs` of the nearest alive cornucopia, or -1 if none.
-int nearestCornucopiaIndex(const std::vector<Cornucopia>& cs, sf::Vector2f from) {
-    int   bestIdx = -1;
-    float minDist = std::numeric_limits<float>::max();
-    for (int i = 0; i < (int)cs.size(); i++) {
-        if (cs[i].isDestroyed()) continue;
-        sf::Vector2f d = cs[i].getPosition() - from;
-        float dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; bestIdx = i; }
-    }
-    return bestIdx;
-}
-
-void drawText(sf::RenderWindow& window, sf::Font& font,
-              const std::string& str, float x, float y,
-              unsigned int size, sf::Color color, bool centered = false)
-{
-    sf::Text text;
-    text.setFont(font);
-    text.setString(str);
-    text.setCharacterSize(size);
-    text.setFillColor(color);
-
-    if (centered) {
-        float textWidth = text.getLocalBounds().width;
-        x = x - textWidth / 2.f;
-    }
-
-    text.setPosition(x, y);
-    window.draw(text);
-}
+sf::Vector2f nearestCornucopia(const std::vector<Cornucopia>& cs, sf::Vector2f from);
+int nearestCornucopiaIndex(const std::vector<Cornucopia>& cs, sf::Vector2f from) ;
+void drawText(sf::RenderWindow& window, sf::Font& font, const std::string& str, float x, float y, unsigned int size, sf::Color color, bool centered = false);
 
 int main() {
 
@@ -88,18 +50,23 @@ int main() {
     map.loadFromFile("assets/map.txt");
     sf::Vector2i hoveredTile = {-1, -1};
 
-    // Place the starting cornucopia at the center tile
     sf::Vector2i centerTile = map.worldToGrid({ WINDOW_WIDTH / 2.f, WINDOW_HEIGHT / 2.f });
     cornucopias.emplace_back(map.tileCenter(centerTile));
     map.setTower(centerTile);
 
     GameState state = GameState::Menu;
 
+    /*  --------------------------------------------------------
+        GAME LOOP
+        -------------------------------------------------------- */ 
     while (window.isOpen()) {
 
         float dt = clock.restart().asSeconds();
         if (dt > 0.1f) dt = 0.1f;
 
+        /*  --------------------------------------------------------
+        PROCESS EVENTS - USER INPUT
+        -------------------------------------------------------- */ 
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
@@ -162,15 +129,17 @@ int main() {
             }
         }
 
-        // ── Update ────────────────────────────────────────────────────────────
+        /*  ----------------------------------------------------
+        UPDATE SECTION
+        -------------------------------------------------------- */ 
         if (state == GameState::Playing) {
 
-            // Count alive cornucopias
+        
             int aliveCornucopias = 0;
             for (const auto& c : cornucopias)
                 if (!c.isDestroyed()) aliveCornucopias++;
 
-            // Win: 5 alive cornucopias
+            
             if (aliveCornucopias >= 5) { state = GameState::Won;  goto render; }
             // Lose: all cornucopias gone
             if (aliveCornucopias == 0) { state = GameState::Lost; goto render; }
@@ -182,29 +151,29 @@ int main() {
                 hud.update(dt, waterPoints, waveNumber, true, aliveCornucopias);
             }
 
-            // Cornucopia updates
+          
             for (auto& c : cornucopias) c.update(dt);
 
-            // Enemy spawning and movement
+           
             spawner.update(dt, enemies);
 
             for (auto& e : enemies) {
                 if (!e.isAlive()) continue;
 
-                // Move toward nearest alive cornucopia
+              
                 sf::Vector2f target = nearestCornucopia(cornucopias, e.getPosition());
                 e.update(dt, target);
 
-                // Damage the nearest cornucopia if the enemy has reached it
+         
                 int idx = nearestCornucopiaIndex(cornucopias, e.getPosition());
                 if (idx >= 0 && e.hasReachedTarget(cornucopias[idx].getPosition())) {
                     cornucopias[idx].takeDamage(e.getDamage());
-                    e.takeDamage(9999.f);           // enemy dies on impact
-                    waterPoints += e.getReward();   // earn currency for the kill
+                    e.takeDamage(9999.f);          
+                    waterPoints += e.getReward();  
                 }
             }
 
-            // Remove dead enemies
+            
             enemies.erase(
                 std::remove_if(enemies.begin(), enemies.end(),
                                [](const Enemy& e) { return !e.isAlive(); }),
@@ -212,7 +181,9 @@ int main() {
         }
 
         render:
-        // ── Render ────────────────────────────────────────────────────────────
+        /*  --------------------------------------------------------
+        RENDERING
+        -------------------------------------------------------- */ 
         window.clear();
 
         if (state == GameState::Menu) {
@@ -248,4 +219,55 @@ int main() {
     }
 
     return 0;
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    FUNCTIONS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+/* Checks for the nearest Cornucopia */
+sf::Vector2f nearestCornucopia(const std::vector<Cornucopia>& cs, sf::Vector2f from) {
+    sf::Vector2f best = from;
+    float minDist = std::numeric_limits<float>::max();
+    for (const auto& c : cs) {
+        if (c.isDestroyed()) continue;
+        sf::Vector2f d = c.getPosition() - from;
+        float dist = std::sqrt(d.x*d.x + d.y*d.y);
+        if (dist < minDist) { minDist = dist; best = c.getPosition(); }
+    }
+    return best;
+}
+
+/* Returns the index in the vector of the nearest Cornucopia */
+int nearestCornucopiaIndex(const std::vector<Cornucopia>& cs, sf::Vector2f from) {
+    int   bestIdx = -1;
+    float minDist = std::numeric_limits<float>::max();
+    for (int i = 0; i < (int)cs.size(); i++) {
+        if (cs[i].isDestroyed()) continue;
+        sf::Vector2f d = cs[i].getPosition() - from;
+        float dist = std::sqrt(d.x*d.x + d.y*d.y);
+        if (dist < minDist) { minDist = dist; bestIdx = i; }
+    }
+    return bestIdx;
+}
+
+/* Used to draw text */
+void drawText(sf::RenderWindow& window, sf::Font& font,
+              const std::string& str, float x, float y,
+              unsigned int size, sf::Color color, bool centered)
+{
+    sf::Text text;
+    text.setFont(font);
+    text.setString(str);
+    text.setCharacterSize(size);
+    text.setFillColor(color);
+
+    if (centered) {
+        float textWidth = text.getLocalBounds().width;
+        x = x - textWidth / 2.f;
+    }
+
+    text.setPosition(x, y);
+    window.draw(text);
 }
