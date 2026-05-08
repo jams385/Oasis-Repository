@@ -160,16 +160,13 @@ int main() {
             for (auto& e : enemies) {
                 if (!e.isAlive()) continue;
 
-              
                 sf::Vector2f target = nearestCornucopia(cornucopias, e.getPosition());
                 e.update(dt, target);
 
-         
-                int idx = nearestCornucopiaIndex(cornucopias, e.getPosition());
-                if (idx >= 0 && e.hasReachedTarget(cornucopias[idx].getPosition())) {
-                    cornucopias[idx].takeDamage(e.getDamage());
-                    e.takeDamage(9999.f);          
-                    waterPoints += e.getReward();  
+                // Melee attack: deal damage once per attack interval
+                if (e.consumeAttack()) {
+                    int idx = nearestCornucopiaIndex(cornucopias, e.getPosition());
+                    if (idx >= 0) cornucopias[idx].takeDamage(e.getDamage());
                 }
             }
 
