@@ -11,6 +11,7 @@
 #include "Enemy.h"
 #include "EnemySpawner.h"
 #include "Cornucopia.h"
+#include "Bullet.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ const int WINDOW_HEIGHT = 720;
 std::vector<Tower>      towers;
 std::vector<Enemy>      enemies;
 std::vector<Cornucopia> cornucopias;
+std::vector<Bullet>     bullets;
 EnemySpawner            spawner(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 /* Function Prototypes */
@@ -84,6 +86,7 @@ int main() {
                     towers.clear();
                     enemies.clear();
                     cornucopias.clear();
+                    bullets.clear();
                     waterPoints = 150;
                     waveNumber  = 1;
                     map = Map();
@@ -140,7 +143,7 @@ int main() {
 
             
             if (aliveCornucopias >= 5) { state = GameState::Won;  goto render; }
-            // Lose: all cornucopias gone
+    
             if (aliveCornucopias == 0) { state = GameState::Lost; goto render; }
 
             hud.update(dt, waterPoints, waveNumber, false, aliveCornucopias);
@@ -153,7 +156,21 @@ int main() {
           
             for (auto& c : cornucopias) c.update(dt);
 
-           
+            for (auto& t : towers) t.update(dt, enemies, bullets);
+
+            for (auto& b : bullets) {
+                b.update(dt);
+                if (b.isExpired()) continue;
+                for (auto& e : enemies) {
+                    if (!e.isAlive()) continue;
+                    sf::Vector2f d    = b.getPosition() - e.getPosition();
+                    float        dist = std::sqrt(d.x*d.x + d.y*d.y);
+                    if (dist < 16.f) { e.takeDamage(b.getDamage()); b.expire(); break; }
+                }
+            }
+            bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+                [](const Bullet& b) { return b.isExpired(); }), bullets.end());
+
             if (hud.isNight()) spawner.update(dt, enemies);
 
             for (auto& e : enemies) {
@@ -162,18 +179,33 @@ int main() {
                 sf::Vector2f target = nearestCornucopia(cornucopias, e.getPosition());
                 e.update(dt, target);
 
-                // Melee attack: deal damage once per attack interval
                 if (e.consumeAttack()) {
                     int idx = nearestCornucopiaIndex(cornucopias, e.getPosition());
                     if (idx >= 0) cornucopias[idx].takeDamage(e.getDamage());
                 }
             }
 
+            //Spore Puff Splitting Logic
+            std::vector<Enemy> toSpawn;
+            for (auto& e : enemies) {
+                if (!e.isAlive()) {
+                    if (e.shouldSplit()) {
+                        sf::Vector2f p  = e.getPosition();
+                        int          ng = e.getSplitGeneration() + 1;
+                        toSpawn.emplace_back(EnemyType::SporePuff, p + sf::Vector2f(-12.f, 0.f), ng);
+                        toSpawn.emplace_back(EnemyType::SporePuff, p + sf::Vector2f( 12.f, 0.f), ng);
+                    } else {
+                        waterPoints += e.getReward();
+                    }
+                }
+            }
             
             enemies.erase(
                 std::remove_if(enemies.begin(), enemies.end(),
-                               [](const Enemy& e) { return !e.isAlive(); }),
+                                [](const Enemy& e) { return !e.isAlive(); }),
                 enemies.end());
+            for (auto& s : toSpawn) enemies.push_back(std::move(s));
+
         }
 
         render:
@@ -194,6 +226,7 @@ int main() {
             for (auto& c : cornucopias) c.draw(window);
             for (auto& t : towers)      t.draw(window);
             for (auto& e : enemies)     e.draw(window);
+            for (auto& b : bullets)     b.draw(window);
             hud.draw(window);
         }
 

@@ -44,10 +44,11 @@ sf::Vector2f EnemySpawner::randomEdgePosition() {
 
 // ── Random enemy type ─────────────────────────────────────────────────────────
 EnemyType EnemySpawner::randomEnemyType() {
-    int r = rand() % 3;
+    int r = rand() % 4;
     switch (r) {
         case 0:  return EnemyType::DustMummy;
         case 1:  return EnemyType::SporePuff;
-        default: return EnemyType::ShadowCrow;
+        case 2:  return EnemyType::ShadowCrow;
+        default: return EnemyType::RustGolem;
     }
 }

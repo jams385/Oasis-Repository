@@ -2,34 +2,36 @@
 #include <SFML/Graphics.hpp>
 
 enum class EnemyType {
-    DustMummy,    
-    SporePuff,    
-    ShadowCrow    
+    DustMummy,
+    SporePuff,
+    ShadowCrow,
+    RustGolem
 };
 
 class Enemy {
 public:
-    Enemy(EnemyType type, sf::Vector2f startPos);
+    Enemy(EnemyType type, sf::Vector2f startPos, int splitGeneration = 0);
 
     void update(float dt, sf::Vector2f target);
     void draw(sf::RenderWindow& window);
 
     void takeDamage(float amount);
-
-    // Returns true once per attack interval when the enemy is in melee range.
-    // Call each frame; resets the cooldown internally.
+    
     bool consumeAttack();
 
-    bool         isAlive()     const;
-    bool         isAttacking() const;
-    sf::Vector2f getPosition() const;
-    float        getDamage()   const;
-    int          getReward()   const;
-    EnemyType    getType()     const;
+    bool         isAlive()           const;
+    bool         isAttacking()       const;
+    sf::Vector2f getPosition()       const;
+    float        getDamage()         const;
+    int          getReward()         const;
+    EnemyType    getType()           const;
+    bool         shouldSplit()       const;
+    int          getSplitGeneration() const;
 
 private:
     EnemyType       type;
     sf::Vector2f    position;
+    int             splitGeneration;
     float           speed;
     float           hp;
     float           maxHp;
