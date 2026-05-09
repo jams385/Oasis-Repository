@@ -48,7 +48,8 @@ private:
 
     // ── Day/Night bar ─────────────────────────────────────────────────────────
     float        dayNightProgress = 0.f;
-    float        cycleDuration    = 30.f;  // seconds for a full day+night cycle
+    float        dayDuration      = 20.f;  // seconds the day phase lasts
+    float        nightDuration    = 50.f;  // seconds the night phase lasts
     bool         _isNight         = false;
     bool         _cycleCompleted  = false; // true for one frame when cycle resets
     sf::RectangleShape dayNightBg;

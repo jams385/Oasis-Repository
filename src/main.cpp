@@ -41,8 +41,7 @@ int main() {
 
     sf::Font Desert_Road_font;
     Desert_Road_font.loadFromFile("/Users/jamilpalma/Oasis-Repository/assets/fonts/desert_road/Desert_Road.otf");
-
-    HUD hud(Desert_Road_font, WINDOW_WIDTH, WINDOW_HEIGHT);
+    HUD hud(Desert_Road_font, WINDOW_WIDTH, WINDOW_HEIGHT); //initializing the hud and its values.
     int waterPoints = 150;
     int waveNumber  = 1;
 
@@ -155,7 +154,7 @@ int main() {
             for (auto& c : cornucopias) c.update(dt);
 
            
-            spawner.update(dt, enemies);
+            if (hud.isNight()) spawner.update(dt, enemies);
 
             for (auto& e : enemies) {
                 if (!e.isAlive()) continue;

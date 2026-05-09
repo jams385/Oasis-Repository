@@ -121,7 +121,7 @@ void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int co
 void HUD::tickDayNight(float dt) {
     _cycleCompleted = false;  // reset every frame - only true for one frame
 
-    dayNightProgress += dt / cycleDuration;
+    dayNightProgress += dt / (_isNight ? nightDuration : dayDuration);
 
     if (dayNightProgress >= 1.f) {
         dayNightProgress = 0.f;
