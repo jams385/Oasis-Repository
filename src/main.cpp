@@ -37,6 +37,9 @@ void drawText(sf::RenderWindow& window, sf::Font& font, const std::string& str, 
 
 int main() {
 
+    /*  --------------------------------------------------------
+        INITIALIZING
+        -------------------------------------------------------- */ 
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Oasis - Prototype");
     window.setFramerateLimit(60);
     sf::Clock clock;
@@ -122,7 +125,10 @@ int main() {
                                 if (hud.getSelectedTower() == SelectedTower::Cornucopia) {
                                     cornucopias.emplace_back(map.tileCenter(tile));
                                 } else {
-                                    towers.push_back(Tower(map.tileCenter(tile)));
+                                    TowerType towerType = TowerType::WaterTower;
+                                    if (hud.getSelectedTower() == SelectedTower::SunBeam)   towerType = TowerType::SunBeam;
+                                    if (hud.getSelectedTower() == SelectedTower::TreeTower)  towerType = TowerType::TreeTower;
+                                    towers.push_back(Tower(map.tileCenter(tile), towerType));
                                 }
                             }
                         }
