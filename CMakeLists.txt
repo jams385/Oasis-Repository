@@ -31,4 +31,9 @@ target_link_libraries(Oasis PRIVATE
     sfml-audio
 )
 
+add_custom_command(TARGET Oasis POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets
+    $<TARGET_FILE_DIR:Oasis>/assets)
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Oasis)

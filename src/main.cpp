@@ -45,7 +45,7 @@ int main() {
     sf::Clock clock;
 
     sf::Font Desert_Road_font;
-    Desert_Road_font.loadFromFile("/Users/jamilpalma/Oasis-Repository/assets/fonts/desert_road/Desert_Road.otf");
+    Desert_Road_font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     HUD hud(Desert_Road_font, WINDOW_WIDTH, WINDOW_HEIGHT); //initializing the hud and its values.
     int waterPoints = 150;
     int waveNumber  = 1;
