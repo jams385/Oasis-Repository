@@ -40,6 +40,7 @@ void Tower::initStats() {
             range         = 250.f;
             damage        = 45.f;
             bulletSpeed   = 350.f;
+            bulletShape   = BulletShape::Beam;
             burstSize     = 1;
             burstDelay    = 0.f;
             burstCooldown = 3.0f;
@@ -96,6 +97,7 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
         cfg.aoeRadius    = aoeRadius;
         cfg.slowFactor   = slowFactor;
         cfg.slowDuration = slowDuration;
+        cfg.shape        = bulletShape;
         bullets.emplace_back(position, dir * bulletSpeed, cfg);
         burstShotsLeft--;
         burstTimer = burstDelay;

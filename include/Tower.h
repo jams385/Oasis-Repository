@@ -19,21 +19,26 @@ private:
     TowerType       type;
     sf::Vector2f    position;
 
-    /* ── EDIT TOWER STATS IN initStats() ───────────────────────────────────── */
+
+    /* Defaults */
     float           range         = 150.f;
     float           damage        = 10.f;
     float           bulletSpeed   = 250.f;
-    float           aoeRadius     = 0.f;    // 0 = single target
-    float           slowFactor    = 1.f;    // 1 = no slow, 0.4 = 40% speed
-    float           slowDuration  = 0.f;
-    float           fireTimer     = 0.f;
+    float           fireTimer     = 0.f; 
 
-    // Burst fire
-    int             burstSize      = 1;     // shots per burst
+    /* Slowing Down */
+    float           aoeRadius     = 0.f;
+    float           slowFactor    = 1.f;
+    float           slowDuration  = 0.f;
+
+    BulletShape     bulletShape   = BulletShape::Circle;
+
+    /* Burst Shots */
+    int             burstSize      = 1;     
     int             burstShotsLeft = 0;
-    float           burstDelay     = 0.f;   // seconds between shots within a burst
+    float           burstDelay     = 0.f; 
     float           burstTimer     = 0.f;
-    float           burstCooldown  = 1.f;   // seconds between bursts
+    float           burstCooldown  = 1.f;  
 
     sf::CircleShape shape;
     sf::CircleShape rangeCircle;

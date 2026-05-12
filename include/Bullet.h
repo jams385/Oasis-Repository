@@ -1,11 +1,14 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+enum class BulletShape { Circle, Beam };
+
 struct BulletConfig {
-    float damage       = 0.f;
-    float aoeRadius    = 0.f;  // 0 = single target
-    float slowFactor   = 1.f;  // 1 = no slow, 0.4 = 40% speed
-    float slowDuration = 0.f;
+    float       damage       = 0.f;
+    float       aoeRadius    = 0.f;
+    float       slowFactor   = 1.f;
+    float       slowDuration = 0.f;
+    BulletShape shape        = BulletShape::Circle;
 };
 
 class Bullet {
@@ -24,15 +27,17 @@ public:
     float        getSlowDuration() const;
 
 private:
-    sf::Vector2f    position;
-    sf::Vector2f    velocity;
-    float           damage;
-    float           aoeRadius;
-    float           slowFactor;
-    float           slowDuration;
-    bool            expired  = false;
-    float           traveled = 0.f;
+    sf::Vector2f       position;
+    sf::Vector2f       velocity;
+    float              damage;
+    float              aoeRadius;
+    float              slowFactor;
+    float              slowDuration;
+    BulletShape        shapeType;
+    bool               expired  = false;
+    float              traveled = 0.f;
     static constexpr float MAX_RANGE = 300.f;
 
-    sf::CircleShape shape;
+    sf::CircleShape    circleShape;
+    sf::RectangleShape beamShape;
 };
