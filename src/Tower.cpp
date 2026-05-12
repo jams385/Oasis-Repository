@@ -37,23 +37,41 @@ void Tower::initStats() {
             break;
 
         case TowerType::SunBeam:
-            // to be done
+            range         = 250.f;
+            damage        = 45.f;
+            bulletSpeed   = 350.f;
+            burstSize     = 1;
+            burstDelay    = 0.f;
+            burstCooldown = 3.0f;
+            shape.setFillColor(sf::Color(220, 180, 30));
+            shape.setOutlineColor(sf::Color(255, 230, 100));
             break;
 
         case TowerType::TreeTower:
-            // to be done
+            range         = 130.f;
+            damage        = 10.f;
+            bulletSpeed   = 200.f;
+            aoeRadius     = 60.f;
+            slowFactor    = 0.4f;
+            slowDuration  = 3.0f;
+            burstSize     = 1;
+            burstDelay    = 0.f;
+            burstCooldown = 2.0f;
+            shape.setFillColor(sf::Color(34, 120, 34));
+            shape.setOutlineColor(sf::Color(80, 180, 80));
             break;
     }
 }
 
 void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bullet>& bullets) {
+
     if (fireTimer  > 0.f) fireTimer  -= dt;
     if (burstTimer > 0.f) burstTimer -= dt;
 
     // Find the nearest alive enemy within range
     const Enemy* target  = nullptr;
     float        minDist = range;
-    
+
     for (const auto& e : enemies) {
         if (!e.isAlive()) continue;
         sf::Vector2f d    = e.getPosition() - position;
@@ -73,7 +91,12 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
         sf::Vector2f dir = target->getPosition() - position;
         float        len = std::sqrt(dir.x*dir.x + dir.y*dir.y);
         dir /= len;
-        bullets.emplace_back(position, dir * 250.f, damage);
+        BulletConfig cfg;
+        cfg.damage       = damage;
+        cfg.aoeRadius    = aoeRadius;
+        cfg.slowFactor   = slowFactor;
+        cfg.slowDuration = slowDuration;
+        bullets.emplace_back(position, dir * bulletSpeed, cfg);
         burstShotsLeft--;
         burstTimer = burstDelay;
     }

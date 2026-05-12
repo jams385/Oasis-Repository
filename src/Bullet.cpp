@@ -1,10 +1,13 @@
 #include "Bullet.h"
 #include <cmath>
 
-Bullet::Bullet(sf::Vector2f pos, sf::Vector2f velocity, float damage)
+Bullet::Bullet(sf::Vector2f pos, sf::Vector2f velocity, BulletConfig config)
     : position(pos)
     , velocity(velocity)
-    , damage(damage)
+    , damage(config.damage)
+    , aoeRadius(config.aoeRadius)
+    , slowFactor(config.slowFactor)
+    , slowDuration(config.slowDuration)
 {
     shape.setRadius(4.f);
     shape.setOrigin(4.f, 4.f);
@@ -27,7 +30,10 @@ void Bullet::draw(sf::RenderWindow& window) {
     if (!expired) window.draw(shape);
 }
 
-void         Bullet::expire()          { expired = true; }
-bool         Bullet::isExpired() const { return expired; }
-sf::Vector2f Bullet::getPosition()const { return position; }
-float        Bullet::getDamage() const { return damage; }
+void         Bullet::expire()              { expired = true; }
+bool         Bullet::isExpired()     const { return expired; }
+sf::Vector2f Bullet::getPosition()   const { return position; }
+float        Bullet::getDamage()     const { return damage; }
+float        Bullet::getAoeRadius()  const { return aoeRadius; }
+float        Bullet::getSlowFactor() const { return slowFactor; }
+float        Bullet::getSlowDuration() const { return slowDuration; }

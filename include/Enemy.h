@@ -16,7 +16,8 @@ public:
     void draw(sf::RenderWindow& window);
 
     void takeDamage(float amount);
-    
+    void applySlow(float factor, float duration);
+
     bool consumeAttack();
 
     bool         isAlive()           const;
@@ -41,6 +42,8 @@ private:
     bool            attacking;    // true while in melee range
     int             reward;
     bool            alive;
+    float           slowTimer    = 0.f;
+    float           slowFactor   = 1.f;
 
     sf::CircleShape shape;
 

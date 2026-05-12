@@ -22,6 +22,10 @@ private:
     /* ── EDIT TOWER STATS IN initStats() ───────────────────────────────────── */
     float           range         = 150.f;
     float           damage        = 10.f;
+    float           bulletSpeed   = 250.f;
+    float           aoeRadius     = 0.f;    // 0 = single target
+    float           slowFactor    = 1.f;    // 1 = no slow, 0.4 = 40% speed
+    float           slowDuration  = 0.f;
     float           fireTimer     = 0.f;
 
     // Burst fire

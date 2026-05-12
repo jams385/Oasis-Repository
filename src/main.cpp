@@ -109,7 +109,8 @@ int main() {
             if (state == GameState::Playing) {
                 if (event.type == sf::Event::MouseButtonPressed &&
                     event.mouseButton.button == sf::Mouse::Left)
-                {
+                {   
+                    /* gets the mouse position in terms of the x and y axis */
                     sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 
                     if (!hud.handleClick(mousePos)) {
@@ -171,7 +172,23 @@ int main() {
                     if (!e.isAlive()) continue;
                     sf::Vector2f d    = b.getPosition() - e.getPosition();
                     float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-                    if (dist < 16.f) { e.takeDamage(b.getDamage()); b.expire(); break; }
+                    if (dist < 16.f) {
+                        if (b.getAoeRadius() > 0.f) {
+                            for (auto& ae : enemies) {
+                                if (!ae.isAlive()) continue;
+                                sf::Vector2f ad    = b.getPosition() - ae.getPosition();
+                                float        adist = std::sqrt(ad.x*ad.x + ad.y*ad.y);
+                                if (adist <= b.getAoeRadius()) {
+                                    ae.takeDamage(b.getDamage());
+                                    ae.applySlow(b.getSlowFactor(), b.getSlowDuration());
+                                }
+                            }
+                        } else {
+                            e.takeDamage(b.getDamage());
+                        }
+                        b.expire();
+                        break;
+                    }
                 }
             }
             bullets.erase(std::remove_if(bullets.begin(), bullets.end(),

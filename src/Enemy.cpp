@@ -84,19 +84,20 @@ void Enemy::initStats() {
 void Enemy::update(float dt, sf::Vector2f target) {
     if (!alive) return;
 
+    if (slowTimer > 0.f) slowTimer -= dt;
+    else                 slowFactor = 1.f;
+
     sf::Vector2f dir  = target - position;
     float        dist = std::sqrt(dir.x*dir.x + dir.y*dir.y);
 
     if (dist <= ATTACK_RANGE) {
-        // In melee range — stand still and tick the attack cooldown
         attacking = true;
         if (attackTimer > 0.f) attackTimer -= dt;
     } else {
-        // Move toward target
         attacking   = false;
-        attackTimer = 0.f;    // reset so first hit lands the moment enemy arrives
+        attackTimer = 0.f;
         dir        /= dist;
-        position   += dir * speed * dt;
+        position   += dir * speed * slowFactor * dt;
         shape.setPosition(position);
     }
 }
@@ -129,6 +130,11 @@ void Enemy::drawHpBar(sf::RenderWindow& window) {
 void Enemy::takeDamage(float amount) {
     hp -= amount;
     if (hp <= 0.f) { hp = 0.f; alive = false; }
+}
+
+void Enemy::applySlow(float factor, float duration) {
+    slowFactor = factor;
+    slowTimer  = duration;
 }
 
 bool Enemy::consumeAttack() {
