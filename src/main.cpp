@@ -170,9 +170,12 @@ int main() {
                 if (b.isExpired()) continue;
                 for (auto& e : enemies) {
                     if (!e.isAlive()) continue;
+
                     sf::Vector2f d    = b.getPosition() - e.getPosition();
                     float        dist = std::sqrt(d.x*d.x + d.y*d.y);
+
                     if (dist < 16.f) {
+
                         if (b.getAoeRadius() > 0.f) {
                             for (auto& ae : enemies) {
                                 if (!ae.isAlive()) continue;
@@ -194,7 +197,7 @@ int main() {
             bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
                 [](const Bullet& b) { return b.isExpired(); }), bullets.end());
 
-            if (hud.isNight()) spawner.update(dt, enemies);
+            if (hud.isNight()) spawner.update(dt, enemies, waveNumber);
 
             for (auto& e : enemies) {
                 if (!e.isAlive()) continue;

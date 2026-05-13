@@ -36,12 +36,13 @@ private:
     float           speed;
     float           hp;
     float           maxHp;
-    float           damage;       // damage per melee hit
-    float           attackSpeed;  // hits per second
-    float           attackTimer;  // counts down; fires when <= 0
-    bool            attacking;    // true while in melee range
+    float           damage;       
+    float           attackSpeed;  
+    float           attackTimer;  
+    bool            attacking;   
     int             reward;
     bool            alive;
+    
     float           slowTimer    = 0.f;
     float           slowFactor   = 1.f;
 

@@ -9,9 +9,9 @@ public:
     EnemySpawner(int windowWidth, int windowHeight);
 
     // Call every frame - spawns enemies on a timer
-    void update(float dt, std::vector<Enemy>& enemies);
+    void update(float dt, std::vector<Enemy>& enemies, int waveNumber);
 
-    void setSpawnInterval(float seconds);  // how often a new enemy spawns
+    void setSpawnInterval(float seconds);
 
 private:
     int   windowWidth;
@@ -19,9 +19,6 @@ private:
     float spawnInterval;
     float spawnTimer = 0.f;
 
-    // Returns a random position on one of the four screen edges
     sf::Vector2f randomEdgePosition();
-
-    // Returns a random enemy type
-    EnemyType randomEnemyType();
+    EnemyType    randomEnemyType(int waveNumber);
 };
