@@ -54,21 +54,20 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
 
 // ── Build structure buttons ───────────────────────────────────────────────────
 void HUD::buildButtons() {
+    
     struct ButtonDef {
-        SelectedTower type;
-        std::string   name;
-        int           cost;
-        sf::Color     color;
+        TowerType   type;
+        std::string name;
+        sf::Color   color;
     };
 
     std::vector<ButtonDef> defs = {
-        { SelectedTower::WaterTower, "Water\nTower",  50,  sf::Color(30, 100, 200)  },
-        { SelectedTower::SunBeam,    "Sun\nBeam",     100, sf::Color(200, 160, 30)  },
-        { SelectedTower::TreeTower,  "Tree\nTower",   75,  sf::Color(34, 120, 34)   },
-        { SelectedTower::Cornucopia, "Cornucopia",    200, sf::Color(160, 110, 10)  },
+        { TowerType::WaterTower, "Water\nTower", sf::Color(30, 100, 200) },
+        { TowerType::SunBeam,    "Sun\nBeam",    sf::Color(200, 160, 30) },
+        { TowerType::TreeTower,  "Tree\nTower",  sf::Color(34, 120, 34)  },
+        { TowerType::Cornucopia, "Cornucopia",   sf::Color(160, 110, 10) },
     };
 
-    // Center the row at the bottom middle of the screen
     float totalWidth = defs.size() * BTN_WIDTH + (defs.size() - 1) * BTN_PADDING;
     float startX     = (windowWidth - totalWidth) / 2.f;
     float y          = windowHeight - BTN_HEIGHT - BTN_Y_OFFSET;
@@ -76,7 +75,7 @@ void HUD::buildButtons() {
     for (int i = 0; i < (int)defs.size(); i++) {
         TowerButton btn;
         btn.type = defs[i].type;
-        btn.cost = defs[i].cost;
+        int cost = Tower::getCost(defs[i].type);
 
         float x = startX + i * (BTN_WIDTH + BTN_PADDING);
 
@@ -93,12 +92,11 @@ void HUD::buildButtons() {
         btn.nameText.setPosition(x + 8.f, y + 6.f);
 
         btn.costText.setFont(font);
-        btn.costText.setString("$" + std::to_string(defs[i].cost));
+        btn.costText.setString("$" + std::to_string(cost));
         btn.costText.setCharacterSize(13);
         btn.costText.setFillColor(sf::Color(200, 230, 255));
         btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
 
-        // First button selected by default
         btn.selected = (i == 0);
 
         buttons.push_back(btn);
@@ -162,13 +160,9 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
     return false;
 }
 
-SelectedTower HUD::getSelectedTower() const { return selectedTower; }
+TowerType HUD::getSelectedTower() const { return selectedTower; }
 
-int HUD::getSelectedCost() const {
-    for (const auto& btn : buttons)
-        if (btn.type == selectedTower) return btn.cost;
-    return 0;
-}
+int HUD::getSelectedCost() const { return Tower::getCost(selectedTower); }
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
 void HUD::draw(sf::RenderWindow& window) {

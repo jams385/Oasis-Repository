@@ -4,7 +4,7 @@
 #include "Enemy.h"
 #include "Bullet.h"
 
-enum class TowerType { WaterTower, SunBeam, TreeTower };
+enum class TowerType { WaterTower, SunBeam, TreeTower, Cornucopia };
 
 class Tower {
 public:
@@ -14,6 +14,7 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
+    static int   getCost(TowerType type);
 
 private:
     TowerType       type;

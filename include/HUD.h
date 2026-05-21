@@ -2,14 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
-
-// Which structure the player currently has selected
-enum class SelectedTower {
-    WaterTower,
-    SunBeam,
-    TreeTower,
-    Cornucopia
-};
+#include "Tower.h"
 
 class HUD {
 public:
@@ -18,9 +11,9 @@ public:
     void update(float dt, int waterPoints, int waveNumber, bool newWave, int cornucopiaCount);
     void draw(sf::RenderWindow& window);
 
-    SelectedTower getSelectedTower() const;
-    int           getSelectedCost()  const;
-    bool handleClick(sf::Vector2f mousePos);
+    TowerType getSelectedTower() const;
+    int       getSelectedCost()  const;
+    bool      handleClick(sf::Vector2f mousePos);
 
     // Day/night cycle
     void tickDayNight(float dt);
@@ -48,10 +41,10 @@ private:
 
     // ── Day/Night bar ─────────────────────────────────────────────────────────
     float        dayNightProgress = 0.f;
-    float        dayDuration      = 20.f;  // seconds the day phase lasts
-    float        nightDuration    = 50.f;  // seconds the night phase lasts
+    float        dayDuration      = 20.f;
+    float        nightDuration    = 50.f;
     bool         _isNight         = false;
-    bool         _cycleCompleted  = false; // true for one frame when cycle resets
+    bool         _cycleCompleted  = false;
     sf::RectangleShape dayNightBg;
     sf::RectangleShape dayNightBar;
     sf::Text           dayNightLabel;
@@ -61,12 +54,11 @@ private:
         sf::RectangleShape shape;
         sf::Text           nameText;
         sf::Text           costText;
-        SelectedTower      type;
-        int                cost;
+        TowerType          type;
         bool               selected = false;
     };
     std::vector<TowerButton> buttons;
-    SelectedTower            selectedTower = SelectedTower::WaterTower;
+    TowerType                selectedTower = TowerType::WaterTower;
 
     void buildButtons();
     void drawDayNightBar(sf::RenderWindow& window);

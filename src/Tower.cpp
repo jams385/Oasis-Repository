@@ -61,6 +61,9 @@ void Tower::initStats() {
             shape.setFillColor(sf::Color(34, 120, 34));
             shape.setOutlineColor(sf::Color(80, 180, 80));
             break;
+
+        case TowerType::Cornucopia:
+            break; // never constructed as a Tower; handled by Cornucopia class
     }
 }
 
@@ -110,3 +113,13 @@ void Tower::draw(sf::RenderWindow& window) {
 }
 
 sf::Vector2f Tower::getPosition() const { return position; }
+
+int Tower::getCost(TowerType type) {
+    switch (type) {
+        case TowerType::WaterTower: return 50;
+        case TowerType::SunBeam:    return 100;
+        case TowerType::TreeTower:  return 75;
+        case TowerType::Cornucopia: return 200;
+        default:                    return 0;
+    }
+}
