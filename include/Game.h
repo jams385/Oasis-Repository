@@ -14,6 +14,7 @@ enum class GameState { Menu, Playing, Won, Lost };
 
 class Game {
 public:
+
     Game(int windowWidth, int windowHeight);
 
     void processEvent(const sf::Event& event, sf::RenderWindow& window);
@@ -21,11 +22,11 @@ public:
     void render(sf::RenderWindow& window);
 
 private:
+
     int       windowWidth;
     int       windowHeight;
     GameState state;
 
-    // font must be declared before hud — hud stores a reference to it
     sf::Font     font;
     Map          map;
     EnemySpawner spawner;

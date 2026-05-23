@@ -23,7 +23,7 @@ void EnemySpawner::setSpawnInterval(float seconds) {
     spawnInterval = seconds;
 }
 
-// ── Random edge position ──────────────────────────────────────────────────────
+// Get a random Edge
 sf::Vector2f EnemySpawner::randomEdgePosition() {
     int edge = rand() % 4;
 
@@ -35,8 +35,8 @@ sf::Vector2f EnemySpawner::randomEdgePosition() {
     }
 }
 
-// ── Wave-gated enemy pool ─────────────────────────────────────────────────────
-// wave  1-5 : DustMummy only
+// Wave Specific Enemies ------------
+// wave  1-5 : DustMummy 
 // wave  6-10: + ShadowCrow
 // wave 11-15: + SporePuff
 // wave   16+: + RustGolem
@@ -45,9 +45,9 @@ EnemyType EnemySpawner::randomEnemyType(int waveNumber) {
 
     pool.push_back(EnemyType::DustMummy);
 
-    if (waveNumber >= 6)  pool.push_back(EnemyType::ShadowCrow);
-    if (waveNumber >= 11) pool.push_back(EnemyType::SporePuff);
-    if (waveNumber >= 16) pool.push_back(EnemyType::RustGolem);
+    if (waveNumber >= 2)  pool.push_back(EnemyType::ShadowCrow);
+    if (waveNumber >= 3) pool.push_back(EnemyType::SporePuff);
+    if (waveNumber >= 4) pool.push_back(EnemyType::RustGolem);
 
     return pool[rand() % pool.size()];
 }

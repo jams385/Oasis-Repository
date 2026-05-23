@@ -17,14 +17,12 @@ Enemy::Enemy(EnemyType type, sf::Vector2f startPos, int splitGeneration)
     shape.setPosition(position);
 }
 
-/* ── EDIT ENEMY STATS HERE ─────────────────────────────────────────────────
-   damage      = HP removed from cornucopia per hit
-   attackSpeed = hits per second (e.g. 1.0 = once/sec, 2.0 = twice/sec)    */
+/* Edit Enemy Stats ------------------------ */
 void Enemy::initStats() {
     switch (type) {
 
         case EnemyType::DustMummy:
-            hp          = 100.f;       
+            hp          = 60.f;       
             speed       = 60.f;
             damage      = 15.f;        
             attackSpeed = 0.8f;         
