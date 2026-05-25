@@ -1,4 +1,5 @@
 #include "EnemySpawner.h"
+#include <algorithm>
 #include <cstdlib>
 #include <vector>
 
@@ -11,7 +12,9 @@ EnemySpawner::EnemySpawner(int windowWidth, int windowHeight){
 void EnemySpawner::update(float dt, std::vector<Enemy>& enemies, int waveNumber) {
     spawnTimer += dt;
 
-    if (spawnTimer >= spawnInterval) {
+    float interval = std::max(0.5f, spawnInterval - (waveNumber - 1) * 0.25f);
+
+    if (spawnTimer >= interval) {
         sf::Vector2f spawnPos = randomEdgePosition();
         EnemyType    type     = randomEnemyType(waveNumber);
         enemies.emplace_back(type, spawnPos);
