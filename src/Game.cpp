@@ -11,7 +11,7 @@ Game::Game(int width, int height)
     , spawner(width, height)
     , hud(font, width, height)
     , waterPoints(150)
-    , waveNumber(1)
+    , waveNumber(0)
     , hoveredTile(-1, -1)
 {
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
@@ -265,7 +265,7 @@ void Game::reset() {
     bullets.clear();
     waterMines.clear();
     waterPoints = 150;
-    waveNumber  = 1;
+    waveNumber  = 0;
 
     map = Map();
     map.loadFromFile("assets/map.txt");

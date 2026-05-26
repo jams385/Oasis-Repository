@@ -5,8 +5,8 @@ enum class CornucopiaState { Broken, Active };
 
 class Cornucopia {
 public:
-    static constexpr int NUM_CORNUCOPIAS = 3;
-    static constexpr int RESTORE_COST    = 200;
+    static constexpr int NUM_CORNUCOPIAS = 4;
+    static constexpr int RESTORE_COST    = 500;
 
     Cornucopia(sf::Vector2f worldPos);
 

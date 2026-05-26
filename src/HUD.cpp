@@ -126,8 +126,8 @@ void HUD::tickDayNight(float dt) {
         dayNightProgress = 0.f;
         _isNight = !_isNight;
 
-        // A full cycle completes when we flip back to day
-        if (!_isNight)
+        // Trigger a new wave when night begins
+        if (_isNight)
             _cycleCompleted = true;
     }
 
@@ -192,13 +192,15 @@ void HUD::drawCurrency(sf::RenderWindow& window) {
 
 
 void HUD::drawWaveInfo(sf::RenderWindow& window) {
-    // Small persistent label
-    std::ostringstream ss;
-    ss << "Wave " << waveNumber;
-    waveText.setString(ss.str());
-    float textWidth = waveText.getLocalBounds().width;
-    waveText.setPosition((windowWidth - textWidth) / 2.f, 14.f);
-    window.draw(waveText);
+    // hidden before the first wave begins
+    if (waveNumber > 0) {
+        std::ostringstream ss;
+        ss << "Wave " << waveNumber;
+        waveText.setString(ss.str());
+        float textWidth = waveText.getLocalBounds().width;
+        waveText.setPosition((windowWidth - textWidth) / 2.f, 14.f);
+        window.draw(waveText);
+    }
 
     // Big announcement that fades out
     if (announcementTimer > 0.f) {
@@ -227,6 +229,6 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
 }
 
 void HUD::drawCornucopiaCount(sf::RenderWindow& window) {
-    cornucopiaText.setString("Active: " + std::to_string(restoredCount) + " / " + std::to_string(totalCornucopias));
+    cornucopiaText.setString("Active Cornucopias: " + std::to_string(restoredCount) + " / " + std::to_string(totalCornucopias));
     window.draw(cornucopiaText);
 }
