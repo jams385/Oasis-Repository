@@ -144,6 +144,15 @@ void HUD::tickDayNight(float dt) {
 bool HUD::isNight()            const { return _isNight; }
 bool HUD::cycleJustCompleted()       { return _cycleCompleted; }
 
+void HUD::reset() {
+    dayNightProgress  = 0.f;
+    _isNight          = false;
+    _cycleCompleted   = false;
+    announcementTimer = 0.f;
+    waveNumber        = 0;
+    dayNightBar.setSize({ 0.f, 18.f });
+}
+
 // ── Handle button clicks ──────────────────────────────────────────────────────
 bool HUD::handleClick(sf::Vector2f mousePos) {
     for (auto& btn : buttons) {
@@ -164,6 +173,7 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
 TowerType HUD::getSelectedTower() const { return selectedTower; }
 
 int HUD::getSelectedCost() const { return Tower::getCost(selectedTower); }
+
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
 void HUD::draw(sf::RenderWindow& window) {

@@ -16,7 +16,7 @@ void EnemySpawner::update(float dt, std::vector<Enemy>& enemies, int waveNumber)
     /* EDIT SPAWN INTERVALS HERE 
         max(limit, current interval)
     */
-    float interval = std::max(0.5f, spawnInterval - (waveNumber - 1) * 0.25f);
+    float interval = std::max(0.5f, spawnInterval - (waveNumber - 1) * 0.5f);
 
     if (spawnTimer >= interval) {
         sf::Vector2f spawnPos = randomEdgePosition();

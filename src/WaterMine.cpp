@@ -1,5 +1,7 @@
 #include "WaterMine.h"
 #include "AudioManager.h"
+#include <cstdlib>
+#include <string>
 
 WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     : position(worldPos)
@@ -26,6 +28,10 @@ WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     sf::FloatRect tb = popText.getLocalBounds();
     popText.setOrigin(tb.left + tb.width / 2.f, tb.top + tb.height / 2.f);
     popText.setPosition(position.x, position.y - 22.f);
+
+    collectText.setFont(font);
+    collectText.setCharacterSize(14);
+    collectText.setStyle(sf::Text::Bold);
 }
 
 static constexpr float HEAL_DELAY = 10.f;
@@ -38,6 +44,17 @@ void WaterMine::update(float dt) {
     if (timeSinceDamage >= HEAL_DELAY && hp < maxHp) {
         hp += HEAL_RATE * dt;
         if (hp > maxHp) hp = maxHp;
+    }
+
+    if (popupTimer > 0.f) {
+        popupTimer -= dt;
+        popupY -= 30.f * dt;
+        collectText.setPosition(position.x, popupY);
+        float alpha = std::min(1.f, popupTimer / 0.4f) * 255.f;
+        sf::Color c = collectText.getFillColor();
+        c.a = static_cast<sf::Uint8>(alpha);
+        collectText.setFillColor(c);
+        if (popupTimer < 0.f) popupTimer = 0.f;
     }
 
     if (ready) return;
@@ -55,6 +72,9 @@ void WaterMine::draw(sf::RenderWindow& window) {
     if (ready) {
         window.draw(popCircle);
         window.draw(popText);
+    }
+    if (popupTimer > 0.f) {
+        window.draw(collectText);
     }
 }
 
@@ -89,5 +109,20 @@ bool         WaterMine::contains(sf::Vector2f mousePos) const { return shape.get
 int WaterMine::collect() {
     ready        = false;
     harvestTimer = 0.f;
-    return harvestAmount;
+
+    int amount = (rand() % 10 < 2) ? 25 : 10;  // 20% rare
+
+    popupAmount = amount;
+    popupTimer  = 1.2f;
+    popupY      = position.y - 22.f;
+
+    collectText.setString("+" + std::to_string(amount));
+    sf::Color col = (amount == 25) ? sf::Color(255, 215, 0) : sf::Color(0, 220, 220);
+    col.a = 255;
+    collectText.setFillColor(col);
+    sf::FloatRect tb = collectText.getLocalBounds();
+    collectText.setOrigin(tb.left + tb.width / 2.f, tb.top + tb.height / 2.f);
+    collectText.setPosition(position.x, popupY);
+
+    return amount;
 }

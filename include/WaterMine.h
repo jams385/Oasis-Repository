@@ -20,16 +20,20 @@ private:
 
     float           harvestTimer    = 0.f;
     float           harvestInterval = 15.f;
-    int             harvestAmount   = 25;
     bool            ready           = false;
 
     float           hp              = 100.f;
     float           maxHp           = 100.f;
     float           timeSinceDamage = 0.f;
 
+    float           popupTimer      = 0.f;
+    float           popupY          = 0.f;
+    int             popupAmount     = 0;
+
     sf::CircleShape shape;
     sf::CircleShape popCircle;
     sf::Text        popText;
+    sf::Text        collectText;
 
     void drawHpBar(sf::RenderWindow& window);
 };

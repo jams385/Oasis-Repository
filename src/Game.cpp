@@ -83,10 +83,12 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
             { event.mouseButton.x, event.mouseButton.y });
         sellTowerIdx = -1;
         sellMineIdx  = -1;
+        for (auto& t : towers) t.setShowRange(false);
         for (int i = 0; i < (int)towers.size(); i++) {
             sf::Vector2f d = towers[i].getPosition() - mousePos;
             if (std::sqrt(d.x*d.x + d.y*d.y) < 14.f) {
                 sellTowerIdx  = i;
+                towers[i].setShowRange(true);
                 sf::Vector2f p = towers[i].getPosition();
                 sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
                 break;
@@ -112,6 +114,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
         sf::Vector2f mousePos = window.mapPixelToCoords(
             { event.mouseButton.x, event.mouseButton.y });
         if (hud.handleClick(mousePos)) {
+            for (auto& t : towers) t.setShowRange(false);
             sellTowerIdx = -1;
             sellMineIdx  = -1;
         } else {
@@ -132,6 +135,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
                         waterMines.erase(waterMines.begin() + sellMineIdx);
                     }
                 }
+                for (auto& t : towers) t.setShowRange(false);
                 sellTowerIdx = -1;
                 sellMineIdx  = -1;
                 handled = true;
@@ -388,9 +392,11 @@ void Game::reset() {
     waterMines.clear();
     waterPoints = 150;
     waveNumber  = 0;
+    wasNight    = false;
 
     map = Map();
     map.loadFromFile("assets/map.txt");
+    hud.reset();
 
     placeCornucopias();
 

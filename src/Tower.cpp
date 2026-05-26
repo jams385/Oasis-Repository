@@ -29,7 +29,7 @@ void Tower::initStats() {
 
         case TowerType::WaterTower:
             range         = 150.f;
-            damage        = 8.f;
+            damage        = 6.f;
             burstSize     = 3;
             burstDelay    = 0.12f;
             burstCooldown = 2.0f;
@@ -149,18 +149,20 @@ void Tower::drawHpBar(sf::RenderWindow& window) {
 
 void Tower::draw(sf::RenderWindow& window) {
     if (isDestroyed()) return;
-    window.draw(rangeCircle);
+    if (showRange) window.draw(rangeCircle);
     window.draw(shape);
     drawHpBar(window);
 }
+
+void Tower::setShowRange(bool show) { showRange = show; }
 
 sf::Vector2f Tower::getPosition() const { return position; }
 TowerType    Tower::getType()     const { return type; }
 
 int Tower::getCost(TowerType type) {
     switch (type) {
-        case TowerType::WaterTower: return 50;
-        case TowerType::SunBeam:    return 100;
+        case TowerType::WaterTower: return 60;
+        case TowerType::SunBeam:    return 150;
         case TowerType::TreeTower:  return 75;
         case TowerType::WaterMine:  return 60;
         default:                    return 0;

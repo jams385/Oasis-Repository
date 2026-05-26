@@ -14,6 +14,7 @@ public:
     TowerType getSelectedTower() const;
     int       getSelectedCost()  const;
     bool      handleClick(sf::Vector2f mousePos);
+    void      reset();
 
     // Day/night cycle
     void tickDayNight(float dt);

@@ -13,10 +13,11 @@ public:
     void update(float dt, const std::vector<Enemy>& enemies, std::vector<Bullet>& bullets);
     void draw(sf::RenderWindow& window);
 
-    sf::Vector2f getPosition() const;
-    TowerType    getType()     const;
-    bool         isDestroyed() const;
+    sf::Vector2f getPosition()           const;
+    TowerType    getType()               const;
+    bool         isDestroyed()           const;
     void         takeDamage(float amount);
+    void         setShowRange(bool show);
     static int   getCost(TowerType type);
 
 private:
@@ -46,6 +47,8 @@ private:
     float           burstDelay     = 0.f; 
     float           burstTimer     = 0.f;
     float           burstCooldown  = 1.f;  
+
+    bool            showRange     = false;
 
     sf::CircleShape shape;
     sf::CircleShape rangeCircle;
