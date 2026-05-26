@@ -20,6 +20,8 @@ Game::Game(int width, int height)
 
     AudioManager::get().loadSound("construction", "assets/audio/construction.wav");
 
+    AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
+
     placeCornucopias();
 }
 
@@ -35,8 +37,10 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
 
     if (state == GameState::Menu) {
         if (event.type == sf::Event::KeyPressed &&
-            event.key.code == sf::Keyboard::Enter)
+            event.key.code == sf::Keyboard::Enter) {
             state = GameState::Playing;
+            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
+        }
         return;
     }
 
@@ -44,6 +48,24 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
         if (event.type == sf::Event::KeyPressed &&
             event.key.code == sf::Keyboard::Enter)
             reset();
+        return;
+    }
+
+    if (state == GameState::Paused) {
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Escape)
+                state = GameState::Playing;
+            else if (event.key.code == sf::Keyboard::M)
+                reset();
+        }
+        return;
+    }
+
+    if (state == GameState::Playing &&
+        event.type == sf::Event::KeyPressed &&
+        event.key.code == sf::Keyboard::Escape)
+    {
+        state = GameState::Paused;
         return;
     }
 
@@ -182,6 +204,13 @@ void Game::update(float dt) {
 
     AudioManager::get().update();
     hud.update(dt, waterPoints, waveNumber, false, activeCount, total);
+
+    bool nowNight = hud.isNight();
+    if (nowNight != wasNight) {
+        wasNight = nowNight;
+        AudioManager::get().playMusic(nowNight ? "assets/audio/OasisNight.ogg"
+                                               : "assets/audio/OasisDay.ogg");
+    }
     if (hud.cycleJustCompleted()) {
         waveNumber++;
         hud.update(dt, waterPoints, waveNumber, true, activeCount, total);
@@ -275,7 +304,7 @@ void Game::render(sf::RenderWindow& window) {
         drawText(window, font, "Press ENTER to start", centerX, 340.f, 28, sf::Color(180,180,180), true);
         drawText(window, font, "Version 0.1",          centerX, 500.f, 18, sf::Color(100,100,100), true);
     }
-    else if (state == GameState::Playing) {
+    else if (state == GameState::Playing || state == GameState::Paused) {
         map.draw(window, hoveredTile);
         for (auto& c : cornucopias) {
             c.draw(window);
@@ -321,6 +350,17 @@ void Game::render(sf::RenderWindow& window) {
         }
 
         hud.draw(window);
+
+        if (state == GameState::Paused) {
+            sf::RectangleShape overlay(sf::Vector2f((float)windowWidth, (float)windowHeight));
+            overlay.setFillColor(sf::Color(0, 0, 0, 160));
+            window.draw(overlay);
+
+            float cx = windowWidth / 2.f;
+            drawText(window, font, "PAUSED",           cx, 180.f, 64, sf::Color::White,        true);
+            drawText(window, font, "ESC - Resume",     cx, 290.f, 28, sf::Color(180, 180, 180), true);
+            drawText(window, font, "M - Main Menu",    cx, 340.f, 28, sf::Color(180, 180, 180), true);
+        }
     }
     else if (state == GameState::Won) {
         float centerX = windowWidth / 2.f;
@@ -355,6 +395,7 @@ void Game::reset() {
     placeCornucopias();
 
     state = GameState::Menu;
+    AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
 }
 
 void Game::handlePlacement(sf::Vector2i tile) {

@@ -11,7 +11,7 @@
 #include "HUD.h"
 #include "WaterMine.h"
 
-enum class GameState { Menu, Playing, Won, Lost };
+enum class GameState { Menu, Playing, Paused, Won, Lost };
 
 class Game {
 public:
@@ -43,6 +43,7 @@ private:
     int          waveNumber;
     sf::Vector2i hoveredTile;
 
+    bool          wasNight      = false;
     int           sellTowerIdx  = -1;
     int           sellMineIdx   = -1;
     sf::FloatRect sellPopupRect;
