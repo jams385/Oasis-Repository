@@ -32,6 +32,7 @@ void Tower::initStats() {
             burstSize     = 3;
             burstDelay    = 0.12f;
             burstCooldown = 2.0f;
+            maxHp         = 150.f;
             shape.setFillColor(sf::Color(30, 100, 200));
             shape.setOutlineColor(sf::Color(100, 180, 255));
             break;
@@ -44,6 +45,7 @@ void Tower::initStats() {
             burstSize     = 1;
             burstDelay    = 0.f;
             burstCooldown = 3.0f;
+            maxHp         = 100.f;
             shape.setFillColor(sf::Color(220, 180, 30));
             shape.setOutlineColor(sf::Color(255, 230, 100));
             break;
@@ -58,6 +60,7 @@ void Tower::initStats() {
             burstSize     = 1;
             burstDelay    = 0.f;
             burstCooldown = 2.0f;
+            maxHp         = 120.f;
             shape.setFillColor(sf::Color(34, 120, 34));
             shape.setOutlineColor(sf::Color(80, 180, 80));
             break;
@@ -66,9 +69,12 @@ void Tower::initStats() {
         case TowerType::WaterMine:
             break;
     }
+
+    hp = maxHp;
 }
 
 void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bullet>& bullets) {
+    if (isDestroyed()) return;
 
     if (fireTimer  > 0.f) fireTimer  -= dt;
     if (burstTimer > 0.f) burstTimer -= dt;
@@ -108,9 +114,34 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
     }
 }
 
+void Tower::takeDamage(float amount) {
+    hp -= amount;
+    if (hp <= 0.f) hp = 0.f;
+}
+
+bool Tower::isDestroyed() const { return hp <= 0.f; }
+
+void Tower::drawHpBar(sf::RenderWindow& window) {
+    float radius   = shape.getRadius();
+    float barWidth = radius * 2.f;
+    float ratio    = hp / maxHp;
+
+    sf::RectangleShape bg({ barWidth, 4.f });
+    bg.setFillColor(sf::Color(80, 0, 0));
+    bg.setPosition(position.x - radius, position.y - radius - 6.f);
+    window.draw(bg);
+
+    sf::RectangleShape bar({ barWidth * ratio, 4.f });
+    bar.setFillColor(sf::Color(255, 100, 50));
+    bar.setPosition(position.x - radius, position.y - radius - 6.f);
+    window.draw(bar);
+}
+
 void Tower::draw(sf::RenderWindow& window) {
+    if (isDestroyed()) return;
     window.draw(rangeCircle);
     window.draw(shape);
+    drawHpBar(window);
 }
 
 sf::Vector2f Tower::getPosition() const { return position; }

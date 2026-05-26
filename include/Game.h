@@ -46,8 +46,8 @@ private:
     void reset();
     void handlePlacement(sf::Vector2i tile);
 
-    sf::Vector2f nearestCornucopiaPos(sf::Vector2f from) const;
-    int          nearestCornucopiaIdx(sf::Vector2f from) const;
+    sf::Vector2f nearestTargetPos(sf::Vector2f from) const;
+    void         damageNearestTarget(sf::Vector2f from, float damage);
 
     static void drawText(sf::RenderWindow& window, sf::Font& font,
                          const std::string& str, float x, float y,

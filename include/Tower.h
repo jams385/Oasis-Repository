@@ -14,12 +14,16 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
+    bool         isDestroyed() const;
+    void         takeDamage(float amount);
     static int   getCost(TowerType type);
 
 private:
     TowerType       type;
     sf::Vector2f    position;
 
+    float           hp            = 100.f;
+    float           maxHp         = 100.f;
 
     /* Defaults */
     float           range         = 150.f;
@@ -45,4 +49,5 @@ private:
     sf::CircleShape rangeCircle;
 
     void initStats();
+    void drawHpBar(sf::RenderWindow& window);
 };

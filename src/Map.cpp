@@ -72,6 +72,13 @@ void Map::setTower(sf::Vector2i tile) {
     grid[tile.y][tile.x] = TILE_TOWER;
 }
 
+void Map::clearTower(sf::Vector2i tile) {
+    if (tile.x < 0 || tile.x >= GRID_COLS) return;
+    if (tile.y < 0 || tile.y >= GRID_ROWS)  return;
+    if (grid[tile.y][tile.x] == TILE_TOWER)
+        grid[tile.y][tile.x] = TILE_EMPTY;
+}
+
 sf::Vector2i Map::worldToGrid(sf::Vector2f worldPos) const {
     return {
         (int)(worldPos.x / TILE_SIZE),

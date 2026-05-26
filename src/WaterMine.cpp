@@ -2,7 +2,7 @@
 
 WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     : position(worldPos)
-    , font(font)
+    , font(&font)
 {
     shape.setRadius(14.f);
     shape.setOrigin(14.f, 14.f);
@@ -28,7 +28,7 @@ WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
 }
 
 void WaterMine::update(float dt) {
-    if (ready) return;
+    if (isDestroyed() || ready) return;
     harvestTimer += dt;
     if (harvestTimer >= harvestInterval) {
         harvestTimer = harvestInterval;
@@ -37,11 +37,36 @@ void WaterMine::update(float dt) {
 }
 
 void WaterMine::draw(sf::RenderWindow& window) {
+    if (isDestroyed()) return;
     window.draw(shape);
+    drawHpBar(window);
     if (ready) {
         window.draw(popCircle);
         window.draw(popText);
     }
+}
+
+void WaterMine::takeDamage(float amount) {
+    hp -= amount;
+    if (hp <= 0.f) hp = 0.f;
+}
+
+bool WaterMine::isDestroyed() const { return hp <= 0.f; }
+
+void WaterMine::drawHpBar(sf::RenderWindow& window) {
+    float radius   = shape.getRadius();
+    float barWidth = radius * 2.f;
+    float ratio    = hp / maxHp;
+
+    sf::RectangleShape bg({ barWidth, 4.f });
+    bg.setFillColor(sf::Color(80, 0, 0));
+    bg.setPosition(position.x - radius, position.y - radius - 6.f);
+    window.draw(bg);
+
+    sf::RectangleShape bar({ barWidth * ratio, 4.f });
+    bar.setFillColor(sf::Color(255, 100, 50));
+    bar.setPosition(position.x - radius, position.y - radius - 6.f);
+    window.draw(bar);
 }
 
 bool         WaterMine::isReady()                       const { return ready; }

@@ -20,6 +20,7 @@ public:
 
     bool isPlaceable(sf::Vector2i tile) const;
     void setTower(sf::Vector2i tile);
+    void clearTower(sf::Vector2i tile);
 
     sf::Vector2i worldToGrid(sf::Vector2f worldPos) const;
     sf::Vector2f gridToWorld(sf::Vector2i tile)     const;

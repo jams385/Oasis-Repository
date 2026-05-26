@@ -133,12 +133,24 @@ void Game::update(float dt) {
     // Enemy movement and attacks
     for (auto& e : enemies) {
         if (!e.isAlive()) continue;
-        e.update(dt, nearestCornucopiaPos(e.getPosition()));
-        if (e.consumeAttack()) {
-            int idx = nearestCornucopiaIdx(e.getPosition());
-            if (idx >= 0) cornucopias[idx].takeDamage(e.getDamage());
-        }
+        e.update(dt, nearestTargetPos(e.getPosition()));
+        if (e.consumeAttack())
+            damageNearestTarget(e.getPosition(), e.getDamage());
     }
+
+    // Remove destroyed towers and free their tiles
+    for (const auto& t : towers)
+        if (t.isDestroyed())
+            map.clearTower(map.worldToGrid(t.getPosition()));
+    towers.erase(std::remove_if(towers.begin(), towers.end(),
+        [](const Tower& t) { return t.isDestroyed(); }), towers.end());
+
+    // Remove destroyed water mines and free their tiles
+    for (const auto& wm : waterMines)
+        if (wm.isDestroyed())
+            map.clearTower(map.worldToGrid(wm.getPosition()));
+    waterMines.erase(std::remove_if(waterMines.begin(), waterMines.end(),
+        [](const WaterMine& wm) { return wm.isDestroyed(); }), waterMines.end());
 
     // SporePuff splitting
     std::vector<Enemy> toSpawn;
@@ -233,29 +245,62 @@ void Game::handlePlacement(sf::Vector2i tile) {
     }
 }
 
-sf::Vector2f Game::nearestCornucopiaPos(sf::Vector2f from) const {
+sf::Vector2f Game::nearestTargetPos(sf::Vector2f from) const {
     sf::Vector2f best    = from;
     float        minDist = std::numeric_limits<float>::max();
+
     for (const auto& c : cornucopias) {
         if (c.isDestroyed()) continue;
         sf::Vector2f d    = c.getPosition() - from;
         float        dist = std::sqrt(d.x*d.x + d.y*d.y);
         if (dist < minDist) { minDist = dist; best = c.getPosition(); }
     }
+    for (const auto& t : towers) {
+        if (t.isDestroyed()) continue;
+        sf::Vector2f d    = t.getPosition() - from;
+        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
+        if (dist < minDist) { minDist = dist; best = t.getPosition(); }
+    }
+    for (const auto& wm : waterMines) {
+        if (wm.isDestroyed()) continue;
+        sf::Vector2f d    = wm.getPosition() - from;
+        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
+        if (dist < minDist) { minDist = dist; best = wm.getPosition(); }
+    }
     return best;
 }
 
-int Game::nearestCornucopiaIdx(sf::Vector2f from) const {
-    int   bestIdx = -1;
+void Game::damageNearestTarget(sf::Vector2f from, float damage) {
     float minDist = std::numeric_limits<float>::max();
+    int   cornIdx = -1;
+    int   towIdx  = -1;
+
     for (int i = 0; i < (int)cornucopias.size(); i++) {
         if (cornucopias[i].isDestroyed()) continue;
         sf::Vector2f d    = cornucopias[i].getPosition() - from;
         float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; bestIdx = i; }
+        if (dist < minDist) { minDist = dist; cornIdx = i; towIdx = -1; }
     }
-    return bestIdx;
+    for (int i = 0; i < (int)towers.size(); i++) {
+        if (towers[i].isDestroyed()) continue;
+        sf::Vector2f d    = towers[i].getPosition() - from;
+        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
+        if (dist < minDist) { minDist = dist; towIdx = i; cornIdx = -1; }
+    }
+
+    int wmIdx = -1;
+    for (int i = 0; i < (int)waterMines.size(); i++) {
+        if (waterMines[i].isDestroyed()) continue;
+        sf::Vector2f d    = waterMines[i].getPosition() - from;
+        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
+        if (dist < minDist) { minDist = dist; wmIdx = i; cornIdx = -1; towIdx = -1; }
+    }
+
+    if (cornIdx >= 0) cornucopias[cornIdx].takeDamage(damage);
+    else if (towIdx >= 0) towers[towIdx].takeDamage(damage);
+    else if (wmIdx  >= 0) waterMines[wmIdx].takeDamage(damage);
 }
+
 
 void Game::drawText(sf::RenderWindow& window, sf::Font& font,
                     const std::string& str, float x, float y,
