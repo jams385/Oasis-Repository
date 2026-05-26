@@ -32,6 +32,7 @@ private:
     sf::Vector2f       position;
     float              hp;
     float              maxHp;
+    float              timeSinceDamage = 0.f;
     CornucopiaState    cornState;
     bool               popupOpen;
 

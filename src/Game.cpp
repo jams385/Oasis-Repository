@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "AudioManager.h"
 #include <cmath>
 #include <limits>
 #include <algorithm>
@@ -16,6 +17,8 @@ Game::Game(int width, int height)
 {
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
+
+    AudioManager::get().loadSound("construction", "assets/audio/construction.wav");
 
     placeCornucopias();
 }
@@ -52,12 +55,65 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
 
     if (state == GameState::Playing &&
         event.type == sf::Event::MouseButtonPressed &&
+        event.mouseButton.button == sf::Mouse::Right)
+    {
+        sf::Vector2f mousePos = window.mapPixelToCoords(
+            { event.mouseButton.x, event.mouseButton.y });
+        sellTowerIdx = -1;
+        sellMineIdx  = -1;
+        for (int i = 0; i < (int)towers.size(); i++) {
+            sf::Vector2f d = towers[i].getPosition() - mousePos;
+            if (std::sqrt(d.x*d.x + d.y*d.y) < 14.f) {
+                sellTowerIdx  = i;
+                sf::Vector2f p = towers[i].getPosition();
+                sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
+                break;
+            }
+        }
+        if (sellTowerIdx == -1) {
+            for (int i = 0; i < (int)waterMines.size(); i++) {
+                sf::Vector2f d = waterMines[i].getPosition() - mousePos;
+                if (std::sqrt(d.x*d.x + d.y*d.y) < 14.f) {
+                    sellMineIdx   = i;
+                    sf::Vector2f p = waterMines[i].getPosition();
+                    sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
+                    break;
+                }
+            }
+        }
+    }
+
+    if (state == GameState::Playing &&
+        event.type == sf::Event::MouseButtonPressed &&
         event.mouseButton.button == sf::Mouse::Left)
     {
         sf::Vector2f mousePos = window.mapPixelToCoords(
             { event.mouseButton.x, event.mouseButton.y });
-        if (!hud.handleClick(mousePos)) {
+        if (hud.handleClick(mousePos)) {
+            sellTowerIdx = -1;
+            sellMineIdx  = -1;
+        } else {
             bool handled = false;
+
+            // Sell popup: confirm or dismiss
+            if (sellTowerIdx >= 0 || sellMineIdx >= 0) {
+                if (sellPopupRect.contains(mousePos)) {
+                    if (sellTowerIdx >= 0 && sellTowerIdx < (int)towers.size()) {
+                        int refund = Tower::getCost(towers[sellTowerIdx].getType()) / 2;
+                        waterPoints += refund;
+                        map.clearTower(map.worldToGrid(towers[sellTowerIdx].getPosition()));
+                        towers.erase(towers.begin() + sellTowerIdx);
+                    } else if (sellMineIdx >= 0 && sellMineIdx < (int)waterMines.size()) {
+                        int refund = Tower::getCost(TowerType::WaterMine) / 2;
+                        waterPoints += refund;
+                        map.clearTower(map.worldToGrid(waterMines[sellMineIdx].getPosition()));
+                        waterMines.erase(waterMines.begin() + sellMineIdx);
+                    }
+                }
+                sellTowerIdx = -1;
+                sellMineIdx  = -1;
+                handled = true;
+            }
 
             // Step 2: confirm restore via open popup
             for (auto& c : cornucopias) {
@@ -124,6 +180,7 @@ void Game::update(float dt) {
     if (activeCount == total) { state = GameState::Won;  return; }
     if (activeCount == 0)     { state = GameState::Lost; return; }
 
+    AudioManager::get().update();
     hud.update(dt, waterPoints, waveNumber, false, activeCount, total);
     if (hud.cycleJustCompleted()) {
         waveNumber++;
@@ -142,7 +199,7 @@ void Game::update(float dt) {
             if (!e.isAlive()) continue;
             sf::Vector2f d    = b.getPosition() - e.getPosition();
             float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-            if (dist < 16.f) {
+            if (dist < 12.f) {
                 if (b.getAoeRadius() > 0.f) {
                     for (auto& ae : enemies) {
                         if (!ae.isAlive()) continue;
@@ -240,6 +297,29 @@ void Game::render(sf::RenderWindow& window) {
         for (auto& wm : waterMines) wm.draw(window);
         for (auto& e : enemies)     e.draw(window);
         for (auto& b : bullets)     b.draw(window);
+
+        // Sell popup
+        if ((sellTowerIdx >= 0 && sellTowerIdx < (int)towers.size()) ||
+            (sellMineIdx  >= 0 && sellMineIdx  < (int)waterMines.size()))
+        {
+            int refund = (sellTowerIdx >= 0)
+                ? Tower::getCost(towers[sellTowerIdx].getType()) / 2
+                : Tower::getCost(TowerType::WaterMine) / 2;
+
+            sf::RectangleShape popup({ sellPopupRect.width, sellPopupRect.height });
+            popup.setPosition(sellPopupRect.left, sellPopupRect.top);
+            popup.setFillColor(sf::Color(20, 20, 40, 220));
+            popup.setOutlineColor(sf::Color(200, 200, 255, 180));
+            popup.setOutlineThickness(1.f);
+            window.draw(popup);
+
+            float cx = sellPopupRect.left + sellPopupRect.width / 2.f;
+            drawText(window, font, "Sell?",
+                     cx, sellPopupRect.top + 4.f,  13, sf::Color(255, 180, 80),  true);
+            drawText(window, font, "+" + std::to_string(refund) + " WP",
+                     cx, sellPopupRect.top + 22.f, 13, sf::Color(180, 230, 255), true);
+        }
+
         hud.draw(window);
     }
     else if (state == GameState::Won) {
@@ -290,6 +370,8 @@ void Game::handlePlacement(sf::Vector2i tile) {
     } else {
         towers.push_back(Tower(map.tileCenter(tile), type));
     }
+
+    AudioManager::get().play("construction");
 }
 
 sf::Vector2f Game::nearestTargetPos(sf::Vector2f from) const {

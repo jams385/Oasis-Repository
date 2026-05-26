@@ -25,6 +25,7 @@ private:
 
     float           hp              = 100.f;
     float           maxHp           = 100.f;
+    float           timeSinceDamage = 0.f;
 
     sf::CircleShape shape;
     sf::CircleShape popCircle;

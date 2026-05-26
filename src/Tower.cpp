@@ -1,12 +1,13 @@
 #include "Tower.h"
+#include "AudioManager.h"
 #include <cmath>
 
 Tower::Tower(sf::Vector2f worldPos, TowerType type)
     : type(type)
     , position(worldPos)
 {
-    shape.setRadius(14.f);
-    shape.setOrigin(14.f, 14.f);
+    shape.setRadius(10.f);
+    shape.setOrigin(10.f, 10.f);
     shape.setOutlineThickness(2.f);
     shape.setPosition(position);
 
@@ -72,8 +73,17 @@ void Tower::initStats() {
     hp = maxHp;
 }
 
+static constexpr float HEAL_DELAY = 10.f;
+static constexpr float HEAL_RATE  = 5.f;
+
 void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bullet>& bullets) {
     if (isDestroyed()) return;
+
+    timeSinceDamage += dt;
+    if (timeSinceDamage >= HEAL_DELAY && hp < maxHp) {
+        hp += HEAL_RATE * dt;
+        if (hp > maxHp) hp = maxHp;
+    }
 
     if (fireTimer  > 0.f) fireTimer  -= dt;
     if (burstTimer > 0.f) burstTimer -= dt;
@@ -116,6 +126,7 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
 void Tower::takeDamage(float amount) {
     hp -= amount;
     if (hp <= 0.f) hp = 0.f;
+    timeSinceDamage = 0.f;
 }
 
 bool Tower::isDestroyed() const { return hp <= 0.f; }
@@ -144,6 +155,7 @@ void Tower::draw(sf::RenderWindow& window) {
 }
 
 sf::Vector2f Tower::getPosition() const { return position; }
+TowerType    Tower::getType()     const { return type; }
 
 int Tower::getCost(TowerType type) {
     switch (type) {

@@ -43,6 +43,10 @@ private:
     int          waveNumber;
     sf::Vector2i hoveredTile;
 
+    int           sellTowerIdx  = -1;
+    int           sellMineIdx   = -1;
+    sf::FloatRect sellPopupRect;
+
     void reset();
     void placeCornucopias();
     void handlePlacement(sf::Vector2i tile);

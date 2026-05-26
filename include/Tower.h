@@ -14,6 +14,7 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
+    TowerType    getType()     const;
     bool         isDestroyed() const;
     void         takeDamage(float amount);
     static int   getCost(TowerType type);
@@ -24,6 +25,7 @@ private:
 
     float           hp            = 100.f;
     float           maxHp         = 100.f;
+    float           timeSinceDamage = 0.f;
 
     /* Defaults */
     float           range         = 150.f;

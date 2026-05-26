@@ -1,22 +1,23 @@
 #include "WaterMine.h"
+#include "AudioManager.h"
 
 WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     : position(worldPos)
     , font(&font)
 {
-    shape.setRadius(14.f);
-    shape.setOrigin(14.f, 14.f);
+    shape.setRadius(10.f);
+    shape.setOrigin(10.f, 10.f);
     shape.setFillColor(sf::Color(0, 160, 160));
     shape.setOutlineColor(sf::Color(0, 220, 220));
     shape.setOutlineThickness(2.f);
     shape.setPosition(position);
 
-    popCircle.setRadius(10.f);
-    popCircle.setOrigin(10.f, 10.f);
+    popCircle.setRadius(8.f);
+    popCircle.setOrigin(8.f, 8.f);
     popCircle.setFillColor(sf::Color::White);
     popCircle.setOutlineColor(sf::Color(0, 160, 160));
     popCircle.setOutlineThickness(2.f);
-    popCircle.setPosition(position.x, position.y - 30.f);
+    popCircle.setPosition(position.x, position.y - 22.f);
 
     popText.setFont(font);
     popText.setString("!");
@@ -24,11 +25,22 @@ WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     popText.setFillColor(sf::Color(0, 100, 100));
     sf::FloatRect tb = popText.getLocalBounds();
     popText.setOrigin(tb.left + tb.width / 2.f, tb.top + tb.height / 2.f);
-    popText.setPosition(position.x, position.y - 30.f);
+    popText.setPosition(position.x, position.y - 22.f);
 }
 
+static constexpr float HEAL_DELAY = 10.f;
+static constexpr float HEAL_RATE  = 5.f;
+
 void WaterMine::update(float dt) {
-    if (isDestroyed() || ready) return;
+    if (isDestroyed()) return;
+
+    timeSinceDamage += dt;
+    if (timeSinceDamage >= HEAL_DELAY && hp < maxHp) {
+        hp += HEAL_RATE * dt;
+        if (hp > maxHp) hp = maxHp;
+    }
+
+    if (ready) return;
     harvestTimer += dt;
     if (harvestTimer >= harvestInterval) {
         harvestTimer = harvestInterval;
@@ -49,6 +61,7 @@ void WaterMine::draw(sf::RenderWindow& window) {
 void WaterMine::takeDamage(float amount) {
     hp -= amount;
     if (hp <= 0.f) hp = 0.f;
+    timeSinceDamage = 0.f;
 }
 
 bool WaterMine::isDestroyed() const { return hp <= 0.f; }

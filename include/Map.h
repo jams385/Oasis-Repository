@@ -6,9 +6,9 @@ constexpr int TILE_EMPTY   = 0;  // placeable ground
 constexpr int TILE_BLOCKED = 2;  // decorative, can't build
 constexpr int TILE_TOWER   = 3;  // occupied by a tower
 
-constexpr int TILE_SIZE = 32;
-constexpr int GRID_COLS = 40; // formula: 1280/tile size
-constexpr int GRID_ROWS = 22; // formula: 720/tile size
+constexpr int TILE_SIZE = 24;
+constexpr int GRID_COLS = 53; // formula: 1280/tile size
+constexpr int GRID_ROWS = 30; // formula: 720/tile size
 
 class Map {
 public:

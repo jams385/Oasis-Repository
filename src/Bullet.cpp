@@ -13,14 +13,14 @@ Bullet::Bullet(sf::Vector2f pos, sf::Vector2f velocity, BulletConfig config)
     , shapeType(config.shape)
 {
     if (shapeType == BulletShape::Circle) {
-        circleShape.setRadius(4.f);
-        circleShape.setOrigin(4.f, 4.f);
+        circleShape.setRadius(3.f);
+        circleShape.setOrigin(3.f, 3.f);
         circleShape.setFillColor(sf::Color(100, 220, 255));
         circleShape.setPosition(position);
     } else {
         // Beam: a thin rectangle rotated to face the direction of travel
-        beamShape.setSize({22.f, 5.f});
-        beamShape.setOrigin(11.f, 2.5f);
+        beamShape.setSize({16.f, 4.f});
+        beamShape.setOrigin(8.f, 2.f);
         beamShape.setFillColor(sf::Color(255, 220, 50));
         float angle = std::atan2(velocity.y, velocity.x) * 180.f / PI;
         beamShape.setRotation(angle);

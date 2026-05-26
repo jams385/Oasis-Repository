@@ -1,8 +1,9 @@
 #include "Cornucopia.h"
+#include "AudioManager.h"
 #include <cmath>
 
-static const float BODY_W  = 26.f;
-static const float BODY_H  = 36.f;
+static const float BODY_W  = 20.f;
+static const float BODY_H  = 27.f;
 static const float MAX_HP  = 300.f;
 static const float POPUP_W = 150.f;
 static const float POPUP_H = 44.f;
@@ -19,14 +20,14 @@ Cornucopia::Cornucopia(sf::Vector2f worldPos)
     body.setPosition(position);
 
     top.setPointCount(3);
-    top.setPoint(0, { 0.f,            -14.f });
+    top.setPoint(0, { 0.f,            -10.f });
     top.setPoint(1, { -BODY_W / 2.f,   0.f  });
     top.setPoint(2, {  BODY_W / 2.f,   0.f  });
     top.setOutlineThickness(1.5f);
     top.setPosition(position.x, position.y - BODY_H / 2.f);
 
     float popupX = position.x - POPUP_W / 2.f;
-    float popupY = position.y - BODY_H / 2.f - 14.f - 8.f - POPUP_H;
+    float popupY = position.y - BODY_H / 2.f - 10.f - 6.f - POPUP_H;
     popupBox.setSize({ POPUP_W, POPUP_H });
     popupBox.setPosition(popupX, popupY);
     popupBox.setFillColor(sf::Color(20, 20, 20, 220));
@@ -72,7 +73,18 @@ bool Cornucopia::containsPoint(sf::Vector2f p) const {
     return body.getGlobalBounds().contains(p) || top.getGlobalBounds().contains(p);
 }
 
-void Cornucopia::update(float /*dt*/) {}
+static constexpr float HEAL_DELAY = 10.f;
+static constexpr float HEAL_RATE  = 5.f;
+
+void Cornucopia::update(float dt) {
+    if (!isActive()) return;
+
+    timeSinceDamage += dt;
+    if (timeSinceDamage >= HEAL_DELAY && hp < maxHp) {
+        hp += HEAL_RATE * dt;
+        if (hp > maxHp) hp = maxHp;
+    }
+}
 
 void Cornucopia::draw(sf::RenderWindow& window) {
     window.draw(top);
@@ -85,10 +97,10 @@ void Cornucopia::draw(sf::RenderWindow& window) {
 
 void Cornucopia::drawHpBar(sf::RenderWindow& window) {
     float ratio = hp / maxHp;
-    float barW  = BODY_W + 12.f;
+    float barW  = BODY_W + 9.f;
     float barH  = 5.f;
     float x     = position.x - barW / 2.f;
-    float y     = position.y - BODY_H / 2.f - 22.f;
+    float y     = position.y - BODY_H / 2.f - 16.f;
 
     sf::RectangleShape bg({ barW, barH });
     bg.setFillColor(sf::Color(80, 0, 0));
@@ -103,6 +115,7 @@ void Cornucopia::drawHpBar(sf::RenderWindow& window) {
 
 void Cornucopia::takeDamage(float amount) {
     if (cornState != CornucopiaState::Active) return;
+    timeSinceDamage = 0.f;
     hp -= amount;
     if (hp <= 0.f) {
         hp        = maxHp; // reset so it starts fresh when restored

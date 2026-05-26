@@ -1,8 +1,9 @@
 #include "Enemy.h"
+#include "AudioManager.h"
 #include <cmath>
 
 
-static const float ATTACK_RANGE = 24.f;
+static const float ATTACK_RANGE = 18.f;
 
 Enemy::Enemy(EnemyType type, sf::Vector2f startPos, int splitGeneration)
     : type(type)
@@ -27,7 +28,7 @@ void Enemy::initStats() {
             damage      = 15.f;        
             attackSpeed = 0.8f;         
             reward      = 10;           
-            shape.setRadius(14.f);
+            shape.setRadius(10.f);
             shape.setFillColor(sf::Color(210, 180, 140));
             shape.setOutlineColor(sf::Color(120, 90, 50));
             shape.setOutlineThickness(2.f);
@@ -36,11 +37,11 @@ void Enemy::initStats() {
         case EnemyType::SporePuff: {
             static const float hpArr[]     = { 50.f, 25.f, 12.f };
             static const float dmgArr[]    = {  8.f,  4.f,  2.f };
-            static const float radArr[]    = { 12.f, 10.f,  8.f };
+            static const float radArr[]    = {  9.f,  7.f,  6.f };
             static const int   rewardArr[] = {    0,    0,   20  };
             hp          = hpArr[splitGeneration];
             damage      = dmgArr[splitGeneration];
-            speed       = 120.f;
+            speed       = 60.f;
             attackSpeed = 1.2f;      
             reward      = rewardArr[splitGeneration];
             shape.setRadius(radArr[splitGeneration]);
@@ -56,7 +57,7 @@ void Enemy::initStats() {
             damage      = 5.f;
             attackSpeed = 2.0f;         
             reward      = 20;          
-            shape.setRadius(8.f);
+            shape.setRadius(6.f);
             shape.setFillColor(sf::Color(50, 50, 80));
             shape.setOutlineColor(sf::Color(100, 100, 180));
             shape.setOutlineThickness(1.5f);
@@ -68,7 +69,7 @@ void Enemy::initStats() {
             damage      = 40.f;        
             attackSpeed = 0.3f;        
             reward      = 50;          
-            shape.setRadius(20.f);
+            shape.setRadius(15.f);
             shape.setFillColor(sf::Color(130, 100, 80));
             shape.setOutlineColor(sf::Color(80, 60, 40));
             shape.setOutlineThickness(3.f);
