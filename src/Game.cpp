@@ -45,15 +45,17 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
     }
 
     if (event.type == sf::Event::MouseMoved) {
-        hoveredTile = map.worldToGrid({ (float)event.mouseMove.x,
-                                        (float)event.mouseMove.y });
+        sf::Vector2f worldPos = window.mapPixelToCoords(
+            { event.mouseMove.x, event.mouseMove.y });
+        hoveredTile = map.worldToGrid(worldPos);
     }
 
     if (state == GameState::Playing &&
         event.type == sf::Event::MouseButtonPressed &&
         event.mouseButton.button == sf::Mouse::Left)
     {
-        sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+        sf::Vector2f mousePos = window.mapPixelToCoords(
+            { event.mouseButton.x, event.mouseButton.y });
         if (!hud.handleClick(mousePos)) {
             bool handled = false;
 
