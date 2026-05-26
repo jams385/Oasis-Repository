@@ -29,7 +29,7 @@ void Tower::initStats() {
 
         case TowerType::WaterTower:
             range         = 150.f;
-            damage        = 6.f;
+            damage        = 7.f;
             burstSize     = 3;
             burstDelay    = 0.12f;
             burstCooldown = 2.0f;
