@@ -62,10 +62,11 @@ void HUD::buildButtons() {
     };
 
     std::vector<ButtonDef> defs = {
-        { TowerType::WaterTower, "Water\nTower", sf::Color(30, 100, 200) },
-        { TowerType::SunBeam,    "Sun\nBeam",    sf::Color(200, 160, 30) },
-        { TowerType::TreeTower,  "Tree\nTower",  sf::Color(34, 120, 34)  },
-        { TowerType::Cornucopia, "Cornucopia",   sf::Color(160, 110, 10) },
+        { TowerType::WaterTower, "Water\nTower", sf::Color(30, 100, 200)  },
+        { TowerType::SunBeam,    "Sun\nBeam",    sf::Color(200, 160, 30)  },
+        { TowerType::TreeTower,  "Tree\nTower",  sf::Color(34, 120, 34)   },
+        { TowerType::Cornucopia, "Cornucopia",   sf::Color(160, 110, 10)  },
+        { TowerType::WaterMine,  "Water\nMine",  sf::Color(0, 130, 130)   },
     };
 
     float totalWidth = defs.size() * BTN_WIDTH + (defs.size() - 1) * BTN_PADDING;

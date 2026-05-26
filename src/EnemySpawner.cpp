@@ -12,6 +12,9 @@ EnemySpawner::EnemySpawner(int windowWidth, int windowHeight){
 void EnemySpawner::update(float dt, std::vector<Enemy>& enemies, int waveNumber) {
     spawnTimer += dt;
 
+    /* EDIT SPAWN INTERVALS HERE 
+        max(limit, current interval)
+    */
     float interval = std::max(0.5f, spawnInterval - (waveNumber - 1) * 0.25f);
 
     if (spawnTimer >= interval) {
@@ -26,7 +29,7 @@ void EnemySpawner::setSpawnInterval(float seconds) {
     spawnInterval = seconds;
 }
 
-// Get a random Edge
+
 sf::Vector2f EnemySpawner::randomEdgePosition() {
     int edge = rand() % 4;
 
@@ -38,11 +41,7 @@ sf::Vector2f EnemySpawner::randomEdgePosition() {
     }
 }
 
-// Wave Specific Enemies ------------
-// wave  1-5 : DustMummy 
-// wave  6-10: + ShadowCrow
-// wave 11-15: + SporePuff
-// wave   16+: + RustGolem
+/* CUSTOMIZE ENEMY POOL PER WAVE */
 EnemyType EnemySpawner::randomEnemyType(int waveNumber) {
     std::vector<EnemyType> pool;
 

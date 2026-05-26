@@ -9,6 +9,7 @@
 #include "Cornucopia.h"
 #include "Bullet.h"
 #include "HUD.h"
+#include "WaterMine.h"
 
 enum class GameState { Menu, Playing, Won, Lost };
 
@@ -36,6 +37,7 @@ private:
     std::vector<Enemy>      enemies;
     std::vector<Cornucopia> cornucopias;
     std::vector<Bullet>     bullets;
+    std::vector<WaterMine>  waterMines;
 
     int          waterPoints;
     int          waveNumber;

@@ -57,9 +57,19 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
     {
         sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
         if (!hud.handleClick(mousePos)) {
-            sf::Vector2i tile = map.worldToGrid(mousePos);
-            if (map.isPlaceable(tile))
-                handlePlacement(tile);
+            bool collected = false;
+            for (auto& wm : waterMines) {
+                if (wm.isReady() && wm.contains(mousePos)) {
+                    waterPoints += wm.collect();
+                    collected = true;
+                    break;
+                }
+            }
+            if (!collected) {
+                sf::Vector2i tile = map.worldToGrid(mousePos);
+                if (map.isPlaceable(tile))
+                    handlePlacement(tile);
+            }
         }
     }
 }
@@ -86,6 +96,7 @@ void Game::update(float dt) {
 
     for (auto& c : cornucopias) c.update(dt);
     for (auto& t : towers)      t.update(dt, enemies, bullets);
+    for (auto& wm : waterMines) wm.update(dt);
 
     // Bullet-enemy collision
     for (auto& b : bullets) {
@@ -163,6 +174,7 @@ void Game::render(sf::RenderWindow& window) {
         map.draw(window, hoveredTile);
         for (auto& c : cornucopias) c.draw(window);
         for (auto& t : towers)      t.draw(window);
+        for (auto& wm : waterMines) wm.draw(window);
         for (auto& e : enemies)     e.draw(window);
         for (auto& b : bullets)     b.draw(window);
         hud.draw(window);
@@ -190,6 +202,7 @@ void Game::reset() {
     enemies.clear();
     cornucopias.clear();
     bullets.clear();
+    waterMines.clear();
     waterPoints = 150;
     waveNumber  = 1;
 
@@ -213,6 +226,8 @@ void Game::handlePlacement(sf::Vector2i tile) {
 
     if (type == TowerType::Cornucopia) {
         cornucopias.emplace_back(map.tileCenter(tile));
+    } else if (type == TowerType::WaterMine) {
+        waterMines.emplace_back(map.tileCenter(tile), font);
     } else {
         towers.push_back(Tower(map.tileCenter(tile), type));
     }

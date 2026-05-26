@@ -63,7 +63,8 @@ void Tower::initStats() {
             break;
 
         case TowerType::Cornucopia:
-            break; // never constructed as a Tower; handled by Cornucopia class
+        case TowerType::WaterMine:
+            break;
     }
 }
 
@@ -120,6 +121,7 @@ int Tower::getCost(TowerType type) {
         case TowerType::SunBeam:    return 100;
         case TowerType::TreeTower:  return 75;
         case TowerType::Cornucopia: return 200;
+        case TowerType::WaterMine:  return 60;
         default:                    return 0;
     }
 }

@@ -4,7 +4,7 @@
 #include "Enemy.h"
 #include "Bullet.h"
 
-enum class TowerType { WaterTower, SunBeam, TreeTower, Cornucopia };
+enum class TowerType { WaterTower, SunBeam, TreeTower, Cornucopia, WaterMine };
 
 class Tower {
 public:
