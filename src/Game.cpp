@@ -2,7 +2,6 @@
 #include <cmath>
 #include <limits>
 #include <algorithm>
-#include <random>
 
 Game::Game(int width, int height)
     : windowWidth(width)
@@ -361,14 +360,10 @@ void Game::placeCornucopias() {
     std::vector<sf::Vector2i> placed = { centerTile };
 
     // Remaining cornucopias start broken, placed randomly
-    std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> colDist(MARGIN, GRID_COLS - 1 - MARGIN);
-    std::uniform_int_distribution<int> rowDist(MARGIN, GRID_ROWS - 1 - MARGIN);
+    while ((int)placed.size() < Cornucopia::NUM_CORNUCOPIAS) {
+        sf::Vector2i tile(MARGIN + std::rand() % (GRID_COLS - 2 * MARGIN),
+                          MARGIN + std::rand() % (GRID_ROWS - 2 * MARGIN));
 
-    int attempts = 0;
-    while ((int)placed.size() < Cornucopia::NUM_CORNUCOPIAS && attempts < 2000) {
-        ++attempts;
-        sf::Vector2i tile(colDist(rng), rowDist(rng));
         if (!map.isPlaceable(tile)) continue;
 
         bool tooClose = false;
@@ -379,7 +374,7 @@ void Game::placeCornucopias() {
         }
         if (tooClose) continue;
 
-        cornucopias.emplace_back(map.tileCenter(tile)); // starts Broken by default
+        cornucopias.emplace_back(map.tileCenter(tile));
         map.setTower(tile);
         placed.push_back(tile);
     }

@@ -1,7 +1,10 @@
 #include <SFML/Graphics.hpp>
+#include <cstdlib>
+#include <ctime>
 #include "Game.h"
 
 int main() {
+    std::srand(std::time(nullptr));
     const int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Oasis");
     window.setFramerateLimit(60);
