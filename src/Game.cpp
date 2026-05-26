@@ -2,6 +2,7 @@
 #include <cmath>
 #include <limits>
 #include <algorithm>
+#include <random>
 
 Game::Game(int width, int height)
     : windowWidth(width)
@@ -17,9 +18,7 @@ Game::Game(int width, int height)
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
 
-    sf::Vector2i centerTile = map.worldToGrid({ width / 2.f, height / 2.f });
-    cornucopias.emplace_back(map.tileCenter(centerTile));
-    map.setTower(centerTile);
+    placeCornucopias();
 }
 
 /* ---------------------------------------------------------
@@ -57,18 +56,53 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
     {
         sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
         if (!hud.handleClick(mousePos)) {
-            bool collected = false;
-            for (auto& wm : waterMines) {
-                if (wm.isReady() && wm.contains(mousePos)) {
-                    waterPoints += wm.collect();
-                    collected = true;
+            bool handled = false;
+
+            // Step 2: confirm restore via open popup
+            for (auto& c : cornucopias) {
+                if (c.isBroken() && c.isPopupOpen()) {
+                    if (c.getPopupBounds().contains(mousePos)) {
+                        if (waterPoints >= Cornucopia::RESTORE_COST) {
+                            waterPoints -= Cornucopia::RESTORE_COST;
+                            c.restore();
+                        }
+                    } else {
+                        c.closePopup();
+                    }
+                    handled = true;
                     break;
                 }
             }
-            if (!collected) {
-                sf::Vector2i tile = map.worldToGrid(mousePos);
-                if (map.isPlaceable(tile))
-                    handlePlacement(tile);
+
+            if (!handled) {
+                // Step 1: click broken cornucopia to open popup
+                for (auto& c : cornucopias) {
+                    if (c.isBroken() && c.containsPoint(mousePos)) {
+                        for (auto& other : cornucopias) other.closePopup();
+                        c.openPopup();
+                        handled = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!handled) {
+                // Close any open popup when clicking elsewhere
+                for (auto& c : cornucopias) c.closePopup();
+
+                bool collected = false;
+                for (auto& wm : waterMines) {
+                    if (wm.isReady() && wm.contains(mousePos)) {
+                        waterPoints += wm.collect();
+                        collected = true;
+                        break;
+                    }
+                }
+                if (!collected) {
+                    sf::Vector2i tile = map.worldToGrid(mousePos);
+                    if (map.isPlaceable(tile))
+                        handlePlacement(tile);
+                }
             }
         }
     }
@@ -81,17 +115,18 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
 void Game::update(float dt) {
     if (state != GameState::Playing) return;
 
-    int aliveCornucopias = 0;
+    int activeCount = 0;
+    int total       = (int)cornucopias.size();
     for (const auto& c : cornucopias)
-        if (!c.isDestroyed()) aliveCornucopias++;
+        if (c.isActive()) activeCount++;
 
-    if (aliveCornucopias >= 5) { state = GameState::Won;  return; }
-    if (aliveCornucopias == 0) { state = GameState::Lost; return; }
+    if (activeCount == total) { state = GameState::Won;  return; }
+    if (activeCount == 0)     { state = GameState::Lost; return; }
 
-    hud.update(dt, waterPoints, waveNumber, false, aliveCornucopias);
+    hud.update(dt, waterPoints, waveNumber, false, activeCount, total);
     if (hud.cycleJustCompleted()) {
         waveNumber++;
-        hud.update(dt, waterPoints, waveNumber, true, aliveCornucopias);
+        hud.update(dt, waterPoints, waveNumber, true, activeCount, total);
     }
 
     for (auto& c : cornucopias) c.update(dt);
@@ -184,7 +219,22 @@ void Game::render(sf::RenderWindow& window) {
     }
     else if (state == GameState::Playing) {
         map.draw(window, hoveredTile);
-        for (auto& c : cornucopias) c.draw(window);
+        for (auto& c : cornucopias) {
+            c.draw(window);
+            if (c.isBroken()) {
+                sf::FloatRect pb = c.getPopupBounds();
+                if (c.isPopupOpen()) {
+                    drawText(window, font, "Restore?", pb.left + pb.width / 2.f, pb.top + 4.f,
+                             13, sf::Color(255, 215, 0), true);
+                    drawText(window, font, std::to_string(Cornucopia::RESTORE_COST) + " WP",
+                             pb.left + pb.width / 2.f, pb.top + 22.f,
+                             13, sf::Color(180, 230, 255), true);
+                } else {
+                    drawText(window, font, "[Click]", c.getPosition().x,
+                             c.getPosition().y - 50.f, 11, sf::Color(160, 160, 160), true);
+                }
+            }
+        }
         for (auto& t : towers)      t.draw(window);
         for (auto& wm : waterMines) wm.draw(window);
         for (auto& e : enemies)     e.draw(window);
@@ -221,9 +271,7 @@ void Game::reset() {
     map = Map();
     map.loadFromFile("assets/map.txt");
 
-    sf::Vector2i centerTile = map.worldToGrid({ windowWidth / 2.f, windowHeight / 2.f });
-    cornucopias.emplace_back(map.tileCenter(centerTile));
-    map.setTower(centerTile);
+    placeCornucopias();
 
     state = GameState::Menu;
 }
@@ -236,9 +284,7 @@ void Game::handlePlacement(sf::Vector2i tile) {
     waterPoints -= cost;
     map.setTower(tile);
 
-    if (type == TowerType::Cornucopia) {
-        cornucopias.emplace_back(map.tileCenter(tile));
-    } else if (type == TowerType::WaterMine) {
+    if (type == TowerType::WaterMine) {
         waterMines.emplace_back(map.tileCenter(tile), font);
     } else {
         towers.push_back(Tower(map.tileCenter(tile), type));
@@ -250,7 +296,7 @@ sf::Vector2f Game::nearestTargetPos(sf::Vector2f from) const {
     float        minDist = std::numeric_limits<float>::max();
 
     for (const auto& c : cornucopias) {
-        if (c.isDestroyed()) continue;
+        if (!c.isActive()) continue;
         sf::Vector2f d    = c.getPosition() - from;
         float        dist = std::sqrt(d.x*d.x + d.y*d.y);
         if (dist < minDist) { minDist = dist; best = c.getPosition(); }
@@ -277,7 +323,7 @@ void Game::damageNearestTarget(sf::Vector2f from, float damage) {
     int wmIdx = -1;
 
     for (int i = 0; i < (int)cornucopias.size(); i++) {
-        if (cornucopias[i].isDestroyed()) continue;
+        if (!cornucopias[i].isActive()) continue;
         sf::Vector2f d    = cornucopias[i].getPosition() - from;
         float        dist = std::sqrt(d.x*d.x + d.y*d.y);
         if (dist < minDist) { minDist = dist; cornIdx = i; towIdx = -1; wmIdx = -1; }
@@ -301,6 +347,43 @@ void Game::damageNearestTarget(sf::Vector2f from, float damage) {
     else if (wmIdx  >= 0) waterMines[wmIdx].takeDamage(damage);
 }
 
+
+void Game::placeCornucopias() {
+    static constexpr int MARGIN   = 6;  // min tiles from any edge
+    static constexpr int MIN_DIST = 8;  // min tile distance between cornucopias
+
+    // Center cornucopia starts active
+    sf::Vector2i centerTile = map.worldToGrid({ windowWidth / 2.f, windowHeight / 2.f });
+    cornucopias.emplace_back(map.tileCenter(centerTile));
+    cornucopias.back().restore();
+    map.setTower(centerTile);
+
+    std::vector<sf::Vector2i> placed = { centerTile };
+
+    // Remaining cornucopias start broken, placed randomly
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> colDist(MARGIN, GRID_COLS - 1 - MARGIN);
+    std::uniform_int_distribution<int> rowDist(MARGIN, GRID_ROWS - 1 - MARGIN);
+
+    int attempts = 0;
+    while ((int)placed.size() < Cornucopia::NUM_CORNUCOPIAS && attempts < 2000) {
+        ++attempts;
+        sf::Vector2i tile(colDist(rng), rowDist(rng));
+        if (!map.isPlaceable(tile)) continue;
+
+        bool tooClose = false;
+        for (const auto& p : placed) {
+            float dx = (float)(tile.x - p.x);
+            float dy = (float)(tile.y - p.y);
+            if (std::sqrt(dx*dx + dy*dy) < (float)MIN_DIST) { tooClose = true; break; }
+        }
+        if (tooClose) continue;
+
+        cornucopias.emplace_back(map.tileCenter(tile)); // starts Broken by default
+        map.setTower(tile);
+        placed.push_back(tile);
+    }
+}
 
 void Game::drawText(sf::RenderWindow& window, sf::Font& font,
                     const std::string& str, float x, float y,

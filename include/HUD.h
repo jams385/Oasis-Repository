@@ -8,7 +8,7 @@ class HUD {
 public:
     HUD(sf::Font& font, int windowWidth, int windowHeight);
 
-    void update(float dt, int waterPoints, int waveNumber, bool newWave, int cornucopiaCount);
+    void update(float dt, int waterPoints, int waveNumber, bool newWave, int restoredCount, int totalCornucopias);
     void draw(sf::RenderWindow& window);
 
     TowerType getSelectedTower() const;
@@ -30,7 +30,8 @@ private:
     sf::Text     currencyText;
 
     // ── Cornucopia count ──────────────────────────────────────────────────────
-    int          cornucopiaCount = 0;
+    int          restoredCount    = 0;
+    int          totalCornucopias = 0;
     sf::Text     cornucopiaText;
 
     // ── Wave ──────────────────────────────────────────────────────────────────

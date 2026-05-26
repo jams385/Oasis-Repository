@@ -65,7 +65,6 @@ void HUD::buildButtons() {
         { TowerType::WaterTower, "Water\nTower", sf::Color(30, 100, 200)  },
         { TowerType::SunBeam,    "Sun\nBeam",    sf::Color(200, 160, 30)  },
         { TowerType::TreeTower,  "Tree\nTower",  sf::Color(34, 120, 34)   },
-        { TowerType::Cornucopia, "Cornucopia",   sf::Color(160, 110, 10)  },
         { TowerType::WaterMine,  "Water\nMine",  sf::Color(0, 130, 130)   },
     };
 
@@ -105,10 +104,11 @@ void HUD::buildButtons() {
 }
 
 // ── Update ────────────────────────────────────────────────────────────────────
-void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int cornucopiaCount) {
-    this->waterPoints     = waterPoints;
-    this->waveNumber      = waveNumber;
-    this->cornucopiaCount = cornucopiaCount;
+void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int restoredCount, int totalCornucopias) {
+    this->waterPoints      = waterPoints;
+    this->waveNumber       = waveNumber;
+    this->restoredCount    = restoredCount;
+    this->totalCornucopias = totalCornucopias;
 
     if (newWave) announcementTimer = 2.5f;
     if (announcementTimer > 0.f) announcementTimer -= dt;
@@ -227,6 +227,6 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
 }
 
 void HUD::drawCornucopiaCount(sf::RenderWindow& window) {
-    cornucopiaText.setString("Oasis: " + std::to_string(cornucopiaCount) + " / 5");
+    cornucopiaText.setString("Active: " + std::to_string(restoredCount) + " / " + std::to_string(totalCornucopias));
     window.draw(cornucopiaText);
 }

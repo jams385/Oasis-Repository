@@ -65,7 +65,6 @@ void Tower::initStats() {
             shape.setOutlineColor(sf::Color(80, 180, 80));
             break;
 
-        case TowerType::Cornucopia:
         case TowerType::WaterMine:
             break;
     }
@@ -151,7 +150,6 @@ int Tower::getCost(TowerType type) {
         case TowerType::WaterTower: return 50;
         case TowerType::SunBeam:    return 100;
         case TowerType::TreeTower:  return 75;
-        case TowerType::Cornucopia: return 200;
         case TowerType::WaterMine:  return 60;
         default:                    return 0;
     }

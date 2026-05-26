@@ -44,6 +44,7 @@ private:
     sf::Vector2i hoveredTile;
 
     void reset();
+    void placeCornucopias();
     void handlePlacement(sf::Vector2i tile);
 
     sf::Vector2f nearestTargetPos(sf::Vector2f from) const;
