@@ -274,21 +274,21 @@ void Game::damageNearestTarget(sf::Vector2f from, float damage) {
     float minDist = std::numeric_limits<float>::max();
     int   cornIdx = -1;
     int   towIdx  = -1;
+    int wmIdx = -1;
 
     for (int i = 0; i < (int)cornucopias.size(); i++) {
         if (cornucopias[i].isDestroyed()) continue;
         sf::Vector2f d    = cornucopias[i].getPosition() - from;
         float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; cornIdx = i; towIdx = -1; }
+        if (dist < minDist) { minDist = dist; cornIdx = i; towIdx = -1; wmIdx = -1; }
     }
     for (int i = 0; i < (int)towers.size(); i++) {
         if (towers[i].isDestroyed()) continue;
         sf::Vector2f d    = towers[i].getPosition() - from;
         float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; towIdx = i; cornIdx = -1; }
+        if (dist < minDist) { minDist = dist; towIdx = i; cornIdx = -1; wmIdx = -1; }
     }
 
-    int wmIdx = -1;
     for (int i = 0; i < (int)waterMines.size(); i++) {
         if (waterMines[i].isDestroyed()) continue;
         sf::Vector2f d    = waterMines[i].getPosition() - from;

@@ -45,7 +45,7 @@ void Tower::initStats() {
             burstSize     = 1;
             burstDelay    = 0.f;
             burstCooldown = 3.0f;
-            maxHp         = 100.f;
+            maxHp         = 200.f;
             shape.setFillColor(sf::Color(220, 180, 30));
             shape.setOutlineColor(sf::Color(255, 230, 100));
             break;
