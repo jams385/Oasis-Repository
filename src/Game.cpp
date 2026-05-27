@@ -42,6 +42,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
 
             AudioManager::get().stopMusic();
             AudioManager::get().play("flute_start");
+            AudioManager::get().play("cutscene_sfx");
             cutscene.reset();
             state = GameState::Cutscene;
 
@@ -50,13 +51,11 @@ void Game::processEvent(const sf::Event& event, Window& window) {
     }
 
     if (state == GameState::Cutscene) {
-        
-        AudioManager::get().stopMusic();
-
-        if (event.type == sf::Event::KeyPressed)
+        if (event.type == sf::Event::KeyPressed) {
             cutscene.skip();
+            AudioManager::get().stopAllSounds();
+        }
         return;
-        
     }
 
     if (state == GameState::Won || state == GameState::Lost) {
@@ -134,8 +133,9 @@ void Game::processEvent(const sf::Event& event, Window& window) {
             { event.mouseButton.x, event.mouseButton.y }); // HUD (virtual 1280x720)
         if (hud.handleClick(hudPos)) {
             for (auto& t : towers) t.setShowRange(false);
-            sellTowerIdx = -1;
-            sellMineIdx  = -1;
+            sellTowerIdx   = -1;
+            sellMineIdx    = -1;
+            selectedCornIdx = -1;
         } else {
             bool handled = false;
 
@@ -244,7 +244,6 @@ void Game::update(float dt) {
         cutscene.update(dt);
         if (cutscene.isDone()) {
             state = GameState::Playing;
-            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
         }
         return;
     }

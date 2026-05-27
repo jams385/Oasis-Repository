@@ -1,6 +1,10 @@
 #include "AudioManager.h"
 #include <stdexcept>
 
+AudioManager::AudioManager() {
+    soundPool.reserve(16);
+}
+
 AudioManager& AudioManager::get() {
     static AudioManager instance;
     return instance;
@@ -42,6 +46,11 @@ void AudioManager::stopMusic() {
 
 void AudioManager::setMusicVolume(float volume) {
     music.setVolume(volume);
+}
+
+void AudioManager::stopAllSounds() {
+    for (auto& s : soundPool) s.stop();
+    soundPool.clear();
 }
 
 void AudioManager::update() {

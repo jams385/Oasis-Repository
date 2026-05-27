@@ -17,10 +17,10 @@ private:
     enum class Phase { FadeIn, Hold, FadeOut, Gap };
 
     static constexpr float FADE_IN  = 1.2f;
-    static constexpr float HOLD     = 1.6f;
+    static constexpr float HOLD     = 2.f;
     static constexpr float FADE_OUT = 0.9f;
     static constexpr float GAP      = 0.3f;
-    static constexpr float LONG_GAP = 1.5f; // gap after the "Life" group
+    static constexpr float LONG_GAP = 1.f; // gap after the "Life" group
 
     struct Line {
         std::string  text;

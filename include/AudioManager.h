@@ -16,9 +16,10 @@ public:
     void setMusicVolume(float volume);
 
     void update(); // call each frame to clean up finished sounds
+    void stopAllSounds();
 
 private:
-    AudioManager() = default;
+    AudioManager();
 
     std::unordered_map<std::string, sf::SoundBuffer> buffers;
     std::vector<sf::Sound>                           soundPool;

@@ -14,13 +14,19 @@ struct AnimatedSprite {
     bool hasFrames() const { return !frames.empty(); }
 
     void update(float dt) {
+
         if (frames.empty()) return;
+
         timer += dt;
+
         if (timer >= 1.f / fps) {
+
             timer -= 1.f / fps;
             frameIndex = (frameIndex + 1) % (int)frames.size();
             sprite.setTexture(SpriteManager::get().getTexture(frames[frameIndex]), true);
+            
         }
+
     }
 
     void draw(sf::RenderWindow& window, sf::Vector2f pos) {
