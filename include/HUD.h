@@ -14,6 +14,8 @@ public:
     TowerType getSelectedTower() const;
     int       getSelectedCost()  const;
     bool      handleClick(sf::Vector2f mousePos);
+    void      deselect();
+    bool      hasSelection() const;
     void      reset();
 
     // Day/night cycle
@@ -61,6 +63,7 @@ private:
     };
     std::vector<TowerButton> buttons;
     TowerType                selectedTower = TowerType::WaterTower;
+    bool                     _hasSelection = false;
 
     void buildButtons();
     void drawDayNightBar(sf::RenderWindow& window);

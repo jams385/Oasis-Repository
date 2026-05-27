@@ -43,14 +43,16 @@ private:
     int          waveNumber;
     sf::Vector2i hoveredTile;
 
-    bool          wasNight      = false;
-    int           sellTowerIdx  = -1;
-    int           sellMineIdx   = -1;
+    bool          wasNight       = false;
+    int           sellTowerIdx   = -1;
+    int           sellMineIdx    = -1;
     sf::FloatRect sellPopupRect;
+    int           selectedCornIdx = -1;
 
     void reset();
     void placeCornucopias();
     void handlePlacement(sf::Vector2i tile);
+    bool isAdjacentToCornucopia(sf::Vector2i tile) const;
 
     sf::Vector2f nearestTargetPos(sf::Vector2f from) const;
     void         damageNearestTarget(sf::Vector2f from, float damage);

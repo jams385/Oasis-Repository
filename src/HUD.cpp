@@ -157,22 +157,35 @@ void HUD::reset() {
 bool HUD::handleClick(sf::Vector2f mousePos) {
     for (auto& btn : buttons) {
         if (btn.shape.getGlobalBounds().contains(mousePos)) {
-            for (auto& b : buttons) {
-                b.selected = false;
-                b.shape.setOutlineThickness(1.5f);
+            if (btn.selected) {
+                deselect();
+            } else {
+                for (auto& b : buttons) {
+                    b.selected = false;
+                    b.shape.setOutlineThickness(1.5f);
+                }
+                btn.selected = true;
+                btn.shape.setOutlineThickness(3.f);
+                selectedTower = btn.type;
+                _hasSelection = true;
             }
-            btn.selected = true;
-            btn.shape.setOutlineThickness(3.f);
-            selectedTower = btn.type;
             return true;
         }
     }
     return false;
 }
 
-TowerType HUD::getSelectedTower() const { return selectedTower; }
+void HUD::deselect() {
+    for (auto& b : buttons) {
+        b.selected = false;
+        b.shape.setOutlineThickness(1.5f);
+    }
+    _hasSelection = false;
+}
 
-int HUD::getSelectedCost() const { return Tower::getCost(selectedTower); }
+bool      HUD::hasSelection()     const { return _hasSelection; }
+TowerType HUD::getSelectedTower() const { return selectedTower; }
+int       HUD::getSelectedCost()  const { return Tower::getCost(selectedTower); }
 
 
 // ── Draw ──────────────────────────────────────────────────────────────────────

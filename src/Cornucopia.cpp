@@ -58,6 +58,7 @@ void Cornucopia::restore() {
     cornState = CornucopiaState::Active;
     hp        = maxHp;
     popupOpen = false;
+    soldier.activate(position);
     applyVisual();
 }
 
@@ -120,12 +121,20 @@ void Cornucopia::takeDamage(float amount) {
     if (hp <= 0.f) {
         hp        = maxHp; // reset so it starts fresh when restored
         cornState = CornucopiaState::Broken;
+        soldier.deactivate();
         applyVisual();
     }
 }
 
-bool         Cornucopia::isBroken() const { return cornState == CornucopiaState::Broken; }
-bool         Cornucopia::isActive() const { return cornState == CornucopiaState::Active; }
+bool         Cornucopia::isBroken()    const { return cornState == CornucopiaState::Broken; }
+bool         Cornucopia::isActive()    const { return cornState == CornucopiaState::Active; }
 sf::Vector2f Cornucopia::getPosition() const { return position; }
 float        Cornucopia::getHp()       const { return hp; }
 float        Cornucopia::getMaxHp()    const { return maxHp; }
+
+void Cornucopia::updateSoldier(float dt, std::vector<Enemy>& enemies) { soldier.update(dt, enemies); }
+void Cornucopia::drawSoldier(sf::RenderWindow& window)                { soldier.draw(window); }
+void Cornucopia::drawSoldierRadius(sf::RenderWindow& window)          { soldier.drawPatrolRadius(window); }
+void Cornucopia::orderSoldierTo(sf::Vector2f p)                       { soldier.orderMoveTo(p); }
+bool Cornucopia::soldierContainsPoint(sf::Vector2f p) const           { return soldier.containsPoint(p); }
+bool Cornucopia::hasSoldier()                         const           { return soldier.isActive(); }

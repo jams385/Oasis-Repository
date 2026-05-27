@@ -81,6 +81,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
     {
         sf::Vector2f mousePos = window.mapPixelToCoords(
             { event.mouseButton.x, event.mouseButton.y });
+        selectedCornIdx = -1;
         sellTowerIdx = -1;
         sellMineIdx  = -1;
         for (auto& t : towers) t.setShowRange(false);
@@ -105,6 +106,9 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
                 }
             }
         }
+
+        if (sellTowerIdx == -1 && sellMineIdx == -1)
+            hud.deselect();
     }
 
     if (state == GameState::Playing &&
@@ -169,6 +173,29 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
                 }
             }
 
+            // Soldier ordering: if a cornucopia is selected, click inside radius moves soldier
+            if (!handled && selectedCornIdx >= 0) {
+                sf::Vector2f cornPos = cornucopias[selectedCornIdx].getPosition();
+                sf::Vector2f d       = mousePos - cornPos;
+                if (std::sqrt(d.x*d.x + d.y*d.y) <= Soldier::PATROL_RADIUS) {
+                    cornucopias[selectedCornIdx].orderSoldierTo(mousePos);
+                    handled = true;
+                } else {
+                    selectedCornIdx = -1;
+                }
+            }
+
+            // Cornucopia selection: click an active cornucopia to show its patrol radius
+            if (!handled) {
+                for (int i = 0; i < (int)cornucopias.size(); i++) {
+                    if (cornucopias[i].isActive() && cornucopias[i].containsPoint(mousePos)) {
+                        selectedCornIdx = (selectedCornIdx == i) ? -1 : i;
+                        handled = true;
+                        break;
+                    }
+                }
+            }
+
             if (!handled) {
                 // Close any open popup when clicking elsewhere
                 for (auto& c : cornucopias) c.closePopup();
@@ -183,7 +210,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
                 }
                 if (!collected) {
                     sf::Vector2i tile = map.worldToGrid(mousePos);
-                    if (map.isPlaceable(tile))
+                    if (map.isPlaceable(tile) && hud.hasSelection())
                         handlePlacement(tile);
                 }
             }
@@ -221,6 +248,10 @@ void Game::update(float dt) {
     }
 
     for (auto& c : cornucopias) c.update(dt);
+    for (auto& c : cornucopias) if (c.isActive()) c.updateSoldier(dt, enemies);
+    if (selectedCornIdx >= 0 && !cornucopias[selectedCornIdx].isActive())
+        selectedCornIdx = -1;
+
     for (auto& t : towers)      t.update(dt, enemies, bullets);
     for (auto& wm : waterMines) wm.update(dt);
 
@@ -309,7 +340,12 @@ void Game::render(sf::RenderWindow& window) {
         drawText(window, font, "Version 0.1",          centerX, 500.f, 18, sf::Color(100,100,100), true);
     }
     else if (state == GameState::Playing || state == GameState::Paused) {
-        map.draw(window, hoveredTile);
+        bool showHover = hud.hasSelection() && !isAdjacentToCornucopia(hoveredTile);
+        map.draw(window, showHover ? hoveredTile : sf::Vector2i(-1, -1));
+
+        if (selectedCornIdx >= 0 && selectedCornIdx < (int)cornucopias.size())
+            cornucopias[selectedCornIdx].drawSoldierRadius(window);
+
         for (auto& c : cornucopias) {
             c.draw(window);
             if (c.isBroken()) {
@@ -328,6 +364,7 @@ void Game::render(sf::RenderWindow& window) {
         }
         for (auto& t : towers)      t.draw(window);
         for (auto& wm : waterMines) wm.draw(window);
+        for (auto& c : cornucopias) c.drawSoldier(window);
         for (auto& e : enemies)     e.draw(window);
         for (auto& b : bullets)     b.draw(window);
 
@@ -390,9 +427,10 @@ void Game::reset() {
     cornucopias.clear();
     bullets.clear();
     waterMines.clear();
-    waterPoints = 150;
-    waveNumber  = 0;
-    wasNight    = false;
+    waterPoints     = 150;
+    waveNumber      = 0;
+    wasNight        = false;
+    selectedCornIdx = -1;
 
     map = Map();
     map.loadFromFile("assets/map.txt");
@@ -404,10 +442,20 @@ void Game::reset() {
     AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
 }
 
+bool Game::isAdjacentToCornucopia(sf::Vector2i tile) const {
+    for (const auto& c : cornucopias) {
+        sf::Vector2i ct = map.worldToGrid(c.getPosition());
+        if (std::abs(tile.x - ct.x) <= 1 && std::abs(tile.y - ct.y) <= 1)
+            return true;
+    }
+    return false;
+}
+
 void Game::handlePlacement(sf::Vector2i tile) {
     TowerType type = hud.getSelectedTower();
     int       cost = Tower::getCost(type);
     if (waterPoints < cost) return;
+    if (isAdjacentToCornucopia(tile)) return;
 
     waterPoints -= cost;
     map.setTower(tile);

@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Soldier.h"
 
 enum class CornucopiaState { Broken, Active };
 
@@ -22,6 +23,13 @@ public:
 
     bool containsPoint(sf::Vector2f p) const;
 
+    void updateSoldier(float dt, std::vector<Enemy>& enemies);
+    void drawSoldier(sf::RenderWindow& window);
+    void drawSoldierRadius(sf::RenderWindow& window);
+    void orderSoldierTo(sf::Vector2f worldPos);
+    bool soldierContainsPoint(sf::Vector2f p) const;
+    bool hasSoldier()                         const;
+
     bool         isBroken()  const;
     bool         isActive()  const;
     sf::Vector2f getPosition() const;
@@ -39,6 +47,7 @@ private:
     sf::RectangleShape body;
     sf::ConvexShape    top;
     sf::RectangleShape popupBox;
+    Soldier            soldier;
 
     void drawHpBar(sf::RenderWindow& window);
     void applyVisual();

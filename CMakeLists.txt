@@ -21,6 +21,7 @@ add_executable(Oasis
     src/Enemy.cpp
     src/EnemySpawner.cpp
     src/Cornucopia.cpp
+    src/Soldier.cpp
     src/Bullet.cpp
     src/WaterMine.cpp
     src/AudioManager.cpp
