@@ -29,7 +29,7 @@ void Enemy::initStats() {
             attackSpeed = 0.8f;
             reward      = 10;
             shape.setRadius(12.f);
-            animSprite.frames = { "dust_mummy_0", "dust_mummy_1", "dust_mummy_2", "dust_mummy_3" };
+            animSprite.frames = { "dust_mummy_0", "dust_mummy_1", "dust_mummy_2", "dust_mummy_3", "dust_mummy_4", "dust_mummy_5" };
             animSprite.fps    = 6.f;
             {
                 sf::Texture& t = SpriteManager::get().getTexture("dust_mummy_0");

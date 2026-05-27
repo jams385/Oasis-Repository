@@ -20,11 +20,13 @@ Game::Game(int width, int height)
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
 
-    static const std::string ENEMY_TILES = "assets/kenney_desert-shooter-pack_1.0(1)/PNG/Enemies/Tiles/";
-    SpriteManager::get().loadTexture("dust_mummy_0", ENEMY_TILES + "tile_0012.png");
-    SpriteManager::get().loadTexture("dust_mummy_1", ENEMY_TILES + "tile_0013.png");
-    SpriteManager::get().loadTexture("dust_mummy_2", ENEMY_TILES + "tile_0014.png");
-    SpriteManager::get().loadTexture("dust_mummy_3", ENEMY_TILES + "tile_0015.png");
+    static const std::string ENEMY_TILES = "assets/OASIS-GRAPHICS/little mummy walk/";
+    SpriteManager::get().loadTexture("dust_mummy_0", ENEMY_TILES + "sprite_0.png");
+    SpriteManager::get().loadTexture("dust_mummy_1", ENEMY_TILES + "sprite_1.png");
+    SpriteManager::get().loadTexture("dust_mummy_2", ENEMY_TILES + "sprite_2.png");
+    SpriteManager::get().loadTexture("dust_mummy_3", ENEMY_TILES + "sprite_3.png");
+    SpriteManager::get().loadTexture("dust_mummy_4", ENEMY_TILES + "sprite_4.png");
+    SpriteManager::get().loadTexture("dust_mummy_5", ENEMY_TILES + "sprite_5.png");
 
     AudioManager::get().loadSound("construction", "assets/audio/construction.wav");
 
