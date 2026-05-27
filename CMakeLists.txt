@@ -44,4 +44,12 @@ add_custom_command(TARGET Oasis POST_BUILD
     ${CMAKE_SOURCE_DIR}/assets
     $<TARGET_FILE_DIR:Oasis>/assets)
 
+if(WIN32)
+    add_custom_command(TARGET Oasis POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_RUNTIME_DLLS:Oasis>
+        $<TARGET_FILE_DIR:Oasis>
+        COMMAND_EXPAND_LISTS)
+endif()
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Oasis)
