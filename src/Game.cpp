@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Window.h"
 #include "AudioManager.h"
+#include "SpriteManager.h"
 #include "GameUtils.h"
 #include <limits>
 #include <algorithm>
@@ -18,6 +19,12 @@ Game::Game(int width, int height)
 {
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
+
+    static const std::string ENEMY_TILES = "assets/kenney_desert-shooter-pack_1.0(1)/PNG/Enemies/Tiles/";
+    SpriteManager::get().loadTexture("dust_mummy_0", ENEMY_TILES + "tile_0012.png");
+    SpriteManager::get().loadTexture("dust_mummy_1", ENEMY_TILES + "tile_0013.png");
+    SpriteManager::get().loadTexture("dust_mummy_2", ENEMY_TILES + "tile_0014.png");
+    SpriteManager::get().loadTexture("dust_mummy_3", ENEMY_TILES + "tile_0015.png");
 
     AudioManager::get().loadSound("construction", "assets/audio/construction.wav");
 
@@ -237,7 +244,7 @@ void Game::update(float dt) {
     if (activeCount == 0)     { state = GameState::Lost; return; }
 
     AudioManager::get().update();
-    hud.update(dt, waterPoints, waveNumber, false, activeCount, total);
+    hud.update(dt, waterPoints, waveNumber, false, activeCount, total, (int)waterMines.size(), mineLimit());
 
     bool nowNight = hud.isNight();
     if (nowNight != wasNight) {
@@ -247,7 +254,7 @@ void Game::update(float dt) {
     }
     if (hud.cycleJustCompleted()) {
         waveNumber++;
-        hud.update(0.f, waterPoints, waveNumber, true, activeCount, total);
+        hud.update(0.f, waterPoints, waveNumber, true, activeCount, total, (int)waterMines.size(), mineLimit());
     }
 
     for (auto& c : cornucopias) c.update(dt);
@@ -448,6 +455,12 @@ void Game::reset() {
     AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
 }
 
+int Game::mineLimit() const {
+    int active = 0;
+    for (const auto& c : cornucopias) if (c.isActive()) active++;
+    return 5 + active;
+}
+
 bool Game::isAdjacentToCornucopia(sf::Vector2i tile) const {
     for (const auto& c : cornucopias) {
         sf::Vector2i ct = map.worldToGrid(c.getPosition());
@@ -462,6 +475,7 @@ void Game::handlePlacement(sf::Vector2i tile) {
     int       cost = Tower::getCost(type);
     if (waterPoints < cost) return;
     if (isAdjacentToCornucopia(tile)) return;
+    if (type == TowerType::WaterMine && (int)waterMines.size() >= mineLimit()) return;
 
     waterPoints -= cost;
     map.setTower(tile);

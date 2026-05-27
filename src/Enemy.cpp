@@ -23,15 +23,21 @@ void Enemy::initStats() {
     switch (type) {
 
         case EnemyType::DustMummy:
-            hp          = 60.f;       
+            hp          = 60.f;
             speed       = 60.f;
-            damage      = 15.f;        
-            attackSpeed = 0.8f;         
-            reward      = 10;           
-            shape.setRadius(10.f);
-            shape.setFillColor(sf::Color(210, 180, 140));
-            shape.setOutlineColor(sf::Color(120, 90, 50));
-            shape.setOutlineThickness(2.f);
+            damage      = 15.f;
+            attackSpeed = 0.8f;
+            reward      = 10;
+            shape.setRadius(12.f);
+            animSprite.frames = { "dust_mummy_0", "dust_mummy_1", "dust_mummy_2", "dust_mummy_3" };
+            animSprite.fps    = 6.f;
+            {
+                sf::Texture& t = SpriteManager::get().getTexture("dust_mummy_0");
+                sf::Vector2u sz = t.getSize();
+                animSprite.sprite.setTexture(t, true);
+                animSprite.sprite.setOrigin(sz.x / 2.f, sz.y / 2.f);
+                animSprite.sprite.setScale(1.f, 1.f);
+            }
             break;
 
         case EnemyType::SporePuff: {
@@ -83,6 +89,8 @@ void Enemy::initStats() {
 void Enemy::update(float dt, sf::Vector2f target) {
     if (!alive) return;
 
+    animSprite.update(dt);
+
     if (slowTimer > 0.f) slowTimer -= dt;
     else                 slowFactor = 1.f;
 
@@ -104,7 +112,10 @@ void Enemy::update(float dt, sf::Vector2f target) {
 
 void Enemy::draw(sf::RenderWindow& window) {
     if (!alive) return;
-    window.draw(shape);
+    if (animSprite.hasFrames())
+        animSprite.draw(window, position);
+    else
+        window.draw(shape);
     drawHpBar(window);
 }
 

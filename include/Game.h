@@ -55,6 +55,8 @@ private:
     void handlePlacement(sf::Vector2i tile);
     bool isAdjacentToCornucopia(sf::Vector2i tile) const;
 
+    int mineLimit() const;
+
     struct NearestTarget { int cornIdx = -1, towIdx = -1, wmIdx = -1; };
     NearestTarget findNearestTarget(sf::Vector2f from) const;
 

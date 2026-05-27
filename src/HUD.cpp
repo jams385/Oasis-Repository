@@ -49,6 +49,11 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     cornucopiaText.setFillColor(sf::Color(255, 215, 0));
     cornucopiaText.setPosition(20.f, 14.f);
 
+    // Mine count overlay on button
+    mineCountText.setFont(font);
+    mineCountText.setCharacterSize(12);
+    mineCountText.setFillColor(sf::Color::White);
+
     buildButtons();
 }
 
@@ -104,11 +109,13 @@ void HUD::buildButtons() {
 }
 
 // ── Update ────────────────────────────────────────────────────────────────────
-void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int restoredCount, int totalCornucopias) {
+void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int restoredCount, int totalCornucopias, int mineCount, int mineCap) {
     this->waterPoints      = waterPoints;
     this->waveNumber       = waveNumber;
     this->restoredCount    = restoredCount;
     this->totalCornucopias = totalCornucopias;
+    this->mineCount        = mineCount;
+    this->mineCap          = mineCap;
 
     if (newWave) announcementTimer = 2.5f;
     if (announcementTimer > 0.f) announcementTimer -= dt;
@@ -156,6 +163,7 @@ void HUD::reset() {
 // ── Handle button clicks ──────────────────────────────────────────────────────
 bool HUD::handleClick(sf::Vector2f mousePos) {
     for (auto& btn : buttons) {
+        if (btn.type == TowerType::WaterMine && mineCount >= mineCap) continue;
         if (btn.shape.getGlobalBounds().contains(mousePos)) {
             if (btn.selected) {
                 deselect();
@@ -247,6 +255,25 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
         window.draw(btn.shape);
         window.draw(btn.nameText);
         window.draw(btn.costText);
+
+        if (btn.type == TowerType::WaterMine) {
+            sf::Vector2f pos  = btn.shape.getPosition();
+            sf::Vector2f size = btn.shape.getSize();
+
+            // Mine count label (bottom-right of button)
+            mineCountText.setString(std::to_string(mineCount) + "/" + std::to_string(mineCap));
+            mineCountText.setPosition(pos.x + size.x - mineCountText.getLocalBounds().width - 6.f,
+                                      pos.y + size.y - 22.f);
+            window.draw(mineCountText);
+
+            // Dark overlay when at cap
+            if (mineCount >= mineCap) {
+                sf::RectangleShape overlay(size);
+                overlay.setPosition(pos);
+                overlay.setFillColor(sf::Color(0, 0, 0, 160));
+                window.draw(overlay);
+            }
+        }
     }
 }
 

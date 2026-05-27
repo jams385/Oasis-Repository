@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "AnimatedSprite.h"
 
 enum class EnemyType {
     DustMummy,
@@ -47,6 +48,7 @@ private:
     float           slowFactor   = 1.f;
 
     sf::CircleShape shape;
+    AnimatedSprite  animSprite;
 
     void initStats();
     void drawHpBar(sf::RenderWindow& window);
