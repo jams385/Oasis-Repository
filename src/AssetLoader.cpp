@@ -8,13 +8,13 @@ void AssetLoader::loadAll() {
 }
 
 void AssetLoader::loadSprites() {
-    static const std::string MUMMY = "assets/OASIS-GRAPHICS/little mummy walk/";
-    SpriteManager::get().loadTexture("dust_mummy_0", MUMMY + "sprite_0.png");
-    SpriteManager::get().loadTexture("dust_mummy_1", MUMMY + "sprite_1.png");
-    SpriteManager::get().loadTexture("dust_mummy_2", MUMMY + "sprite_2.png");
-    SpriteManager::get().loadTexture("dust_mummy_3", MUMMY + "sprite_3.png");
-    SpriteManager::get().loadTexture("dust_mummy_4", MUMMY + "sprite_4.png");
-    SpriteManager::get().loadTexture("dust_mummy_5", MUMMY + "sprite_5.png");
+    static const std::string MUMMY = "assets/OASIS-GRAPHICS/BLOOD_GOBLIN_SPRITE/";
+    SpriteManager::get().loadTexture("dust_mummy_0", MUMMY + "1.png");
+    SpriteManager::get().loadTexture("dust_mummy_1", MUMMY + "2.png");
+    SpriteManager::get().loadTexture("dust_mummy_2", MUMMY + "3.png");
+    SpriteManager::get().loadTexture("dust_mummy_3", MUMMY + "4.png");
+    SpriteManager::get().loadTexture("dust_mummy_4", MUMMY + "5.png");
+    SpriteManager::get().loadTexture("dust_mummy_5", MUMMY + "6.png");
 }
 
 void AssetLoader::loadSounds() {
