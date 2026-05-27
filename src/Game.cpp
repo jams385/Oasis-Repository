@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Window.h"
 #include "AudioManager.h"
 #include "GameUtils.h"
 #include <limits>
@@ -29,7 +30,7 @@ Game::Game(int width, int height)
     EVENTS
 ------------------------------------------------------------ */
 
-void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
+void Game::processEvent(const sf::Event& event, Window& window) {
     if (event.type == sf::Event::Closed) {
         window.close();
         return;
@@ -71,7 +72,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
 
     if (event.type == sf::Event::MouseMoved) {
         sf::Vector2f worldPos = window.mapPixelToCoords(
-            { event.mouseMove.x, event.mouseMove.y });
+            { event.mouseMove.x, event.mouseMove.y }); // uses world view
         hoveredTile = map.worldToGrid(worldPos);
     }
 
@@ -80,7 +81,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
         event.mouseButton.button == sf::Mouse::Right)
     {
         sf::Vector2f mousePos = window.mapPixelToCoords(
-            { event.mouseButton.x, event.mouseButton.y });
+            { event.mouseButton.x, event.mouseButton.y }); // world view
         selectedCornIdx = -1;
         sellTowerIdx = -1;
         sellMineIdx  = -1;
@@ -114,8 +115,10 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
         event.mouseButton.button == sf::Mouse::Left)
     {
         sf::Vector2f mousePos = window.mapPixelToCoords(
-            { event.mouseButton.x, event.mouseButton.y });
-        if (hud.handleClick(mousePos)) {
+            { event.mouseButton.x, event.mouseButton.y }); // world view
+        sf::Vector2f hudPos = window.mapMouseToHUD(
+            { event.mouseButton.x, event.mouseButton.y }); // HUD (virtual 1280x720)
+        if (hud.handleClick(hudPos)) {
             for (auto& t : towers) t.setShowRange(false);
             sellTowerIdx = -1;
             sellMineIdx  = -1;
@@ -147,8 +150,11 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
             for (auto& c : cornucopias) {
                 if (c.isBroken() && c.isPopupOpen()) {
                     if (c.getPopupBounds().contains(mousePos)) {
-                        if (waterPoints >= Cornucopia::RESTORE_COST) {
-                            waterPoints -= Cornucopia::RESTORE_COST;
+                        int activeCount = 0;
+                        for (const auto& cc : cornucopias) if (cc.isActive()) activeCount++;
+                        int cost = Cornucopia::getRestoreCost(activeCount);
+                        if (waterPoints >= cost) {
+                            waterPoints -= cost;
                             c.restore();
                         }
                     } else {
@@ -325,28 +331,34 @@ void Game::update(float dt) {
     RENDER
 ------------------------------------------------------------ */
 
-void Game::render(sf::RenderWindow& window) {
+void Game::render(Window& window) {
     if (state == GameState::Menu) {
+        window.setHUDView();
         float centerX = windowWidth / 2.f;
         drawText(window, font, "OASIS",                centerX, 200.f, 72, sf::Color::White,       true);
         drawText(window, font, "Press ENTER to start", centerX, 340.f, 28, sf::Color(180,180,180), true);
         drawText(window, font, "Version 0.1",          centerX, 500.f, 18, sf::Color(100,100,100), true);
     }
     else if (state == GameState::Playing || state == GameState::Paused) {
+        window.setWorldView();
         bool showHover = hud.hasSelection() && !isAdjacentToCornucopia(hoveredTile);
         map.draw(window, showHover ? hoveredTile : sf::Vector2i(-1, -1));
 
         if (selectedCornIdx >= 0 && selectedCornIdx < (int)cornucopias.size())
             cornucopias[selectedCornIdx].drawSoldierRadius(window);
 
+        int activeCount = 0;
+        for (const auto& c : cornucopias) if (c.isActive()) activeCount++;
+
         for (auto& c : cornucopias) {
             c.draw(window);
             if (c.isBroken()) {
                 sf::FloatRect pb = c.getPopupBounds();
                 if (c.isPopupOpen()) {
+                    int cost = Cornucopia::getRestoreCost(activeCount);
                     drawText(window, font, "Restore?", pb.left + pb.width / 2.f, pb.top + 4.f,
                              13, sf::Color(255, 215, 0), true);
-                    drawText(window, font, std::to_string(Cornucopia::RESTORE_COST) + " WP",
+                    drawText(window, font, std::to_string(cost) + " WP",
                              pb.left + pb.width / 2.f, pb.top + 22.f,
                              13, sf::Color(180, 230, 255), true);
                 } else {
@@ -383,6 +395,7 @@ void Game::render(sf::RenderWindow& window) {
                      cx, sellPopupRect.top + 22.f, 13, sf::Color(180, 230, 255), true);
         }
 
+        window.setHUDView();
         hud.draw(window);
 
         if (state == GameState::Paused) {

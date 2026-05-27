@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "Map.h"
+#include "Window.h"
 #include "Tower.h"
 #include "Enemy.h"
 #include "EnemySpawner.h"
@@ -18,9 +19,9 @@ public:
 
     Game(int windowWidth, int windowHeight);
 
-    void processEvent(const sf::Event& event, sf::RenderWindow& window);
+    void processEvent(const sf::Event& event, Window& window);
     void update(float dt);
-    void render(sf::RenderWindow& window);
+    void render(Window& window);
 
 private:
 

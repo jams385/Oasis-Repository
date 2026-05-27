@@ -14,6 +14,7 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(Oasis
     src/main.cpp
+    src/Window.cpp
     src/Game.cpp
     src/Tower.cpp
     src/HUD.cpp
