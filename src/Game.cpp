@@ -21,6 +21,8 @@ Game::Game(int width, int height)
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
 
+    
+
     AssetLoader::loadAll();
 
     placeCornucopias();
@@ -153,11 +155,11 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                         map.clearTower(map.worldToGrid(waterMines[sellMineIdx].getPosition()));
                         waterMines.erase(waterMines.begin() + sellMineIdx);
                     }
+                    handled = true;
                 }
                 for (auto& t : towers) t.setShowRange(false);
                 sellTowerIdx = -1;
                 sellMineIdx  = -1;
-                handled = true;
             }
 
             // Step 2: confirm restore via open popup
@@ -207,6 +209,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                 for (int i = 0; i < (int)cornucopias.size(); i++) {
                     if (cornucopias[i].isActive() && cornucopias[i].containsPoint(mousePos)) {
                         selectedCornIdx = (selectedCornIdx == i) ? -1 : i;
+                        hud.deselect();
                         handled = true;
                         break;
                     }
@@ -227,8 +230,23 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                 }
                 if (!collected) {
                     sf::Vector2i tile = map.worldToGrid(mousePos);
-                    if (map.isPlaceable(tile) && hud.hasSelection())
+                    if (map.isPlaceable(tile) && hud.hasSelection()) {
                         handlePlacement(tile);
+                    } else {
+                        // Click on an existing tower or mine deselects the HUD
+                        for (const auto& t : towers) {
+                            if (dist(t.getPosition(), mousePos) < 14.f) {
+                                hud.deselect();
+                                break;
+                            }
+                        }
+                        for (const auto& wm : waterMines) {
+                            if (dist(wm.getPosition(), mousePos) < 14.f) {
+                                hud.deselect();
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }

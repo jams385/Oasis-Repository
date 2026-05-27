@@ -102,7 +102,7 @@ void HUD::buildButtons() {
         btn.costText.setFillColor(sf::Color(200, 230, 255));
         btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
 
-        btn.selected = (i == 0);
+        btn.selected = false;
 
         buttons.push_back(btn);
     }

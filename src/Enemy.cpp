@@ -36,7 +36,7 @@ void Enemy::initStats() {
                 sf::Vector2u sz = t.getSize();
                 animSprite.sprite.setTexture(t, true);
                 animSprite.sprite.setOrigin(sz.x / 2.f, sz.y / 2.f);
-                animSprite.sprite.setScale(.1f, 0.1f);
+                animSprite.sprite.setScale(1.5f, 1.5f);
             }
             break;
 
