@@ -27,6 +27,8 @@ add_executable(Oasis
     src/WaterMine.cpp
     src/AudioManager.cpp
     src/SpriteManager.cpp
+    src/Cutscene.cpp
+    src/AssetLoader.cpp
 )
 target_include_directories(Oasis PRIVATE include)
 target_compile_features(Oasis PRIVATE cxx_std_17)

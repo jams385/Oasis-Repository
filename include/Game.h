@@ -11,8 +11,9 @@
 #include "Bullet.h"
 #include "HUD.h"
 #include "WaterMine.h"
+#include "Cutscene.h"
 
-enum class GameState { Menu, Playing, Paused, Won, Lost };
+enum class GameState { Menu, Cutscene, Playing, Paused, Won, Lost };
 
 class Game {
 public:
@@ -33,6 +34,7 @@ private:
     Map          map;
     EnemySpawner spawner;
     HUD          hud;
+    Cutscene     cutscene;
 
     std::vector<Tower>      towers;
     std::vector<Enemy>      enemies;

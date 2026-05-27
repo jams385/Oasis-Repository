@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "Window.h"
 #include "AudioManager.h"
-#include "SpriteManager.h"
+#include "AssetLoader.h"
 #include "GameUtils.h"
 #include <limits>
 #include <algorithm>
@@ -13,6 +13,7 @@ Game::Game(int width, int height)
     , map()
     , spawner(width, height)
     , hud(font, width, height)
+    , cutscene(font, width, height)
     , waterPoints(150)
     , waveNumber(0)
     , hoveredTile(-1, -1)
@@ -20,17 +21,7 @@ Game::Game(int width, int height)
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
 
-    static const std::string ENEMY_TILES = "assets/OASIS-GRAPHICS/little mummy walk/";
-    SpriteManager::get().loadTexture("dust_mummy_0", ENEMY_TILES + "sprite_0.png");
-    SpriteManager::get().loadTexture("dust_mummy_1", ENEMY_TILES + "sprite_1.png");
-    SpriteManager::get().loadTexture("dust_mummy_2", ENEMY_TILES + "sprite_2.png");
-    SpriteManager::get().loadTexture("dust_mummy_3", ENEMY_TILES + "sprite_3.png");
-    SpriteManager::get().loadTexture("dust_mummy_4", ENEMY_TILES + "sprite_4.png");
-    SpriteManager::get().loadTexture("dust_mummy_5", ENEMY_TILES + "sprite_5.png");
-
-    AudioManager::get().loadSound("construction", "assets/audio/construction.wav");
-
-    AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
+    AssetLoader::loadAll();
 
     placeCornucopias();
 }
@@ -48,10 +39,24 @@ void Game::processEvent(const sf::Event& event, Window& window) {
     if (state == GameState::Menu) {
         if (event.type == sf::Event::KeyPressed &&
             event.key.code == sf::Keyboard::Enter) {
-            state = GameState::Playing;
-            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
+
+            AudioManager::get().stopMusic();
+            AudioManager::get().play("flute_start");
+            cutscene.reset();
+            state = GameState::Cutscene;
+
         }
         return;
+    }
+
+    if (state == GameState::Cutscene) {
+        
+        AudioManager::get().stopMusic();
+
+        if (event.type == sf::Event::KeyPressed)
+            cutscene.skip();
+        return;
+        
     }
 
     if (state == GameState::Won || state == GameState::Lost) {
@@ -235,6 +240,15 @@ void Game::processEvent(const sf::Event& event, Window& window) {
 ------------------------------------------------------------ */
 
 void Game::update(float dt) {
+    if (state == GameState::Cutscene) {
+        cutscene.update(dt);
+        if (cutscene.isDone()) {
+            state = GameState::Playing;
+            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
+        }
+        return;
+    }
+
     if (state != GameState::Playing) return;
 
     int activeCount = 0;
@@ -341,6 +355,12 @@ void Game::update(float dt) {
 ------------------------------------------------------------ */
 
 void Game::render(Window& window) {
+    if (state == GameState::Cutscene) {
+        window.setHUDView();
+        cutscene.render((sf::RenderWindow&)window);
+        return;
+    }
+
     if (state == GameState::Menu) {
         window.setHUDView();
         float centerX = windowWidth / 2.f;
