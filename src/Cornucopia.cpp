@@ -1,6 +1,6 @@
 #include "Cornucopia.h"
 #include "AudioManager.h"
-#include <cmath>
+#include "GameUtils.h"
 
 static const float BODY_W  = 20.f;
 static const float BODY_H  = 27.f;
@@ -74,9 +74,6 @@ bool Cornucopia::containsPoint(sf::Vector2f p) const {
     return body.getGlobalBounds().contains(p) || top.getGlobalBounds().contains(p);
 }
 
-static constexpr float HEAL_DELAY = 10.f;
-static constexpr float HEAL_RATE  = 5.f;
-
 void Cornucopia::update(float dt) {
     if (!isActive()) return;
 
@@ -97,21 +94,9 @@ void Cornucopia::draw(sf::RenderWindow& window) {
 }
 
 void Cornucopia::drawHpBar(sf::RenderWindow& window) {
-    float ratio = hp / maxHp;
-    float barW  = BODY_W + 9.f;
-    float barH  = 5.f;
-    float x     = position.x - barW / 2.f;
-    float y     = position.y - BODY_H / 2.f - 16.f;
-
-    sf::RectangleShape bg({ barW, barH });
-    bg.setFillColor(sf::Color(80, 0, 0));
-    bg.setPosition(x, y);
-    window.draw(bg);
-
-    sf::RectangleShape bar({ barW * ratio, barH });
-    bar.setFillColor(sf::Color(255, 165, 0));
-    bar.setPosition(x, y);
-    window.draw(bar);
+    float barW = BODY_W + 9.f;
+    drawHealthBar(window, position.x - barW / 2.f, position.y - BODY_H / 2.f - 16.f,
+                  barW, 5.f, hp / maxHp, sf::Color(255, 165, 0));
 }
 
 void Cornucopia::takeDamage(float amount) {
@@ -129,12 +114,8 @@ void Cornucopia::takeDamage(float amount) {
 bool         Cornucopia::isBroken()    const { return cornState == CornucopiaState::Broken; }
 bool         Cornucopia::isActive()    const { return cornState == CornucopiaState::Active; }
 sf::Vector2f Cornucopia::getPosition() const { return position; }
-float        Cornucopia::getHp()       const { return hp; }
-float        Cornucopia::getMaxHp()    const { return maxHp; }
 
 void Cornucopia::updateSoldier(float dt, std::vector<Enemy>& enemies) { soldier.update(dt, enemies); }
 void Cornucopia::drawSoldier(sf::RenderWindow& window)                { soldier.draw(window); }
 void Cornucopia::drawSoldierRadius(sf::RenderWindow& window)          { soldier.drawPatrolRadius(window); }
 void Cornucopia::orderSoldierTo(sf::Vector2f p)                       { soldier.orderMoveTo(p); }
-bool Cornucopia::soldierContainsPoint(sf::Vector2f p) const           { return soldier.containsPoint(p); }
-bool Cornucopia::hasSoldier()                         const           { return soldier.isActive(); }

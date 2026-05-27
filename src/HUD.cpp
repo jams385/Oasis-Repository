@@ -185,7 +185,6 @@ void HUD::deselect() {
 
 bool      HUD::hasSelection()     const { return _hasSelection; }
 TowerType HUD::getSelectedTower() const { return selectedTower; }
-int       HUD::getSelectedCost()  const { return Tower::getCost(selectedTower); }
 
 
 // ── Draw ──────────────────────────────────────────────────────────────────────

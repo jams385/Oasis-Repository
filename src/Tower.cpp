@@ -1,6 +1,6 @@
 #include "Tower.h"
 #include "AudioManager.h"
-#include <cmath>
+#include "GameUtils.h"
 
 Tower::Tower(sf::Vector2f worldPos, TowerType type)
     : type(type)
@@ -73,9 +73,6 @@ void Tower::initStats() {
     hp = maxHp;
 }
 
-static constexpr float HEAL_DELAY = 10.f;
-static constexpr float HEAL_RATE  = 5.f;
-
 void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bullet>& bullets) {
     if (isDestroyed()) return;
 
@@ -94,9 +91,8 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
 
     for (const auto& e : enemies) {
         if (!e.isAlive()) continue;
-        sf::Vector2f d    = e.getPosition() - position;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; target = &e; }
+        float d = dist(e.getPosition(), position);
+        if (d < minDist) { minDist = d; target = &e; }
     }
 
     // Start a new burst when cooldown is ready and a target is in range
@@ -109,8 +105,7 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
     // Fire one shot per burstTimer tick while mid-burst
     if (burstShotsLeft > 0 && burstTimer <= 0.f && target) {
         sf::Vector2f dir = target->getPosition() - position;
-        float        len = std::sqrt(dir.x*dir.x + dir.y*dir.y);
-        dir /= len;
+        dir /= dist(target->getPosition(), position);
         BulletConfig cfg;
         cfg.damage       = damage;
         cfg.aoeRadius    = aoeRadius;
@@ -132,19 +127,9 @@ void Tower::takeDamage(float amount) {
 bool Tower::isDestroyed() const { return hp <= 0.f; }
 
 void Tower::drawHpBar(sf::RenderWindow& window) {
-    float radius   = shape.getRadius();
-    float barWidth = radius * 2.f;
-    float ratio    = hp / maxHp;
-
-    sf::RectangleShape bg({ barWidth, 4.f });
-    bg.setFillColor(sf::Color(80, 0, 0));
-    bg.setPosition(position.x - radius, position.y - radius - 6.f);
-    window.draw(bg);
-
-    sf::RectangleShape bar({ barWidth * ratio, 4.f });
-    bar.setFillColor(sf::Color(255, 100, 50));
-    bar.setPosition(position.x - radius, position.y - radius - 6.f);
-    window.draw(bar);
+    float r = shape.getRadius();
+    drawHealthBar(window, position.x - r, position.y - r - 6.f,
+                  r * 2.f, 4.f, hp / maxHp, sf::Color(255, 100, 50));
 }
 
 void Tower::draw(sf::RenderWindow& window) {

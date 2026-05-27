@@ -1,5 +1,5 @@
 #include "Soldier.h"
-#include <cmath>
+#include "GameUtils.h"
 
 Soldier::Soldier()
     : home(0.f, 0.f)
@@ -36,9 +36,9 @@ void Soldier::deactivate() {
 void Soldier::orderMoveTo(sf::Vector2f worldPos) {
     if (state != SoldierState::Alive) return;
     sf::Vector2f diff = worldPos - home;
-    float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-    if (dist > PATROL_RADIUS)
-        diff = diff / dist * PATROL_RADIUS;
+    float d = dist(worldPos, home);
+    if (d > PATROL_RADIUS)
+        diff = diff / d * PATROL_RADIUS;
     targetPos = home + diff;
 }
 
@@ -59,9 +59,9 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
 
     // Move toward ordered position
     sf::Vector2f diff = targetPos - position;
-    float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-    if (dist > 2.f) {
-        position += diff / dist * moveSpeed * dt;
+    float d = dist(targetPos, position);
+    if (d > 2.f) {
+        position += diff / d * moveSpeed * dt;
         shape.setPosition(position);
     }
 
@@ -72,8 +72,7 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
         float  minDist = attackRange;
         for (auto& e : enemies) {
             if (!e.isAlive()) continue;
-            sf::Vector2f d = e.getPosition() - position;
-            float d_dist = std::sqrt(d.x * d.x + d.y * d.y);
+            float d_dist = dist(e.getPosition(), position);
             if (d_dist < minDist) { minDist = d_dist; target = &e; }
         }
         if (target) {
@@ -85,8 +84,7 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
     // Take passive damage when enemies are in contact
     for (auto& e : enemies) {
         if (!e.isAlive()) continue;
-        sf::Vector2f d = e.getPosition() - position;
-        if (std::sqrt(d.x * d.x + d.y * d.y) < 14.f) {
+        if (dist(e.getPosition(), position) < 14.f) {
             hp -= e.getDamage() * 0.4f * dt;
         }
     }
@@ -121,19 +119,8 @@ void Soldier::drawPatrolRadius(sf::RenderWindow& window) {
 }
 
 void Soldier::drawHpBar(sf::RenderWindow& window) {
-    float barW  = 12.f;
-    float barH  = 3.f;
-    float ratio = hp / maxHp;
-
-    sf::RectangleShape bg({ barW, barH });
-    bg.setFillColor(sf::Color(80, 0, 0));
-    bg.setPosition(position.x - barW / 2.f, position.y - 9.f);
-    window.draw(bg);
-
-    sf::RectangleShape bar({ barW * ratio, barH });
-    bar.setFillColor(sf::Color(80, 220, 80));
-    bar.setPosition(position.x - barW / 2.f, position.y - 9.f);
-    window.draw(bar);
+    drawHealthBar(window, position.x - 6.f, position.y - 9.f,
+                  12.f, 3.f, hp / maxHp, sf::Color(80, 220, 80));
 }
 
 bool         Soldier::isActive()     const { return state != SoldierState::Inactive; }

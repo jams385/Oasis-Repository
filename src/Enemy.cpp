@@ -1,6 +1,6 @@
 #include "Enemy.h"
 #include "AudioManager.h"
-#include <cmath>
+#include "GameUtils.h"
 
 
 static const float ATTACK_RANGE = 18.f;
@@ -86,16 +86,16 @@ void Enemy::update(float dt, sf::Vector2f target) {
     if (slowTimer > 0.f) slowTimer -= dt;
     else                 slowFactor = 1.f;
 
-    sf::Vector2f dir  = target - position;
-    float        dist = std::sqrt(dir.x*dir.x + dir.y*dir.y);
+    sf::Vector2f dir = target - position;
+    float        d   = dist(target, position);
 
-    if (dist <= ATTACK_RANGE) {
+    if (d <= ATTACK_RANGE) {
         attacking = true;
         if (attackTimer > 0.f) attackTimer -= dt;
     } else {
         attacking   = false;
         attackTimer = 0.f;
-        dir        /= dist;
+        dir        /= d;
         position   += dir * speed * slowFactor * dt;
         shape.setPosition(position);
     }
@@ -110,19 +110,9 @@ void Enemy::draw(sf::RenderWindow& window) {
 
 
 void Enemy::drawHpBar(sf::RenderWindow& window) {
-    float radius  = shape.getRadius();
-    float barWidth = radius * 2.f;
-    float ratio   = hp / maxHp;
-
-    sf::RectangleShape bg({ barWidth, 4.f });
-    bg.setFillColor(sf::Color(80, 0, 0));
-    bg.setPosition(position.x - radius, position.y - radius - 6.f);
-    window.draw(bg);
-
-    sf::RectangleShape bar({ barWidth * ratio, 4.f });
-    bar.setFillColor(sf::Color(60, 200, 80));
-    bar.setPosition(position.x - radius, position.y - radius - 6.f);
-    window.draw(bar);
+    float r = shape.getRadius();
+    drawHealthBar(window, position.x - r, position.y - r - 6.f,
+                  r * 2.f, 4.f, hp / maxHp, sf::Color(60, 200, 80));
 }
 
 

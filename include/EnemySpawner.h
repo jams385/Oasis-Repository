@@ -11,8 +11,6 @@ public:
     // Call every frame - spawns enemies on a timer
     void update(float dt, std::vector<Enemy>& enemies, int waveNumber);
 
-    void setSpawnInterval(float seconds);
-
 private:
     int   windowWidth;
     int   windowHeight;

@@ -1,5 +1,6 @@
 #include "WaterMine.h"
 #include "AudioManager.h"
+#include "GameUtils.h"
 #include <cstdlib>
 #include <string>
 
@@ -33,9 +34,6 @@ WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     collectText.setCharacterSize(14);
     collectText.setStyle(sf::Text::Bold);
 }
-
-static constexpr float HEAL_DELAY = 10.f;
-static constexpr float HEAL_RATE  = 5.f;
 
 void WaterMine::update(float dt) {
     if (isDestroyed()) return;
@@ -87,19 +85,9 @@ void WaterMine::takeDamage(float amount) {
 bool WaterMine::isDestroyed() const { return hp <= 0.f; }
 
 void WaterMine::drawHpBar(sf::RenderWindow& window) {
-    float radius   = shape.getRadius();
-    float barWidth = radius * 2.f;
-    float ratio    = hp / maxHp;
-
-    sf::RectangleShape bg({ barWidth, 4.f });
-    bg.setFillColor(sf::Color(80, 0, 0));
-    bg.setPosition(position.x - radius, position.y - radius - 6.f);
-    window.draw(bg);
-
-    sf::RectangleShape bar({ barWidth * ratio, 4.f });
-    bar.setFillColor(sf::Color(255, 100, 50));
-    bar.setPosition(position.x - radius, position.y - radius - 6.f);
-    window.draw(bar);
+    float r = shape.getRadius();
+    drawHealthBar(window, position.x - r, position.y - r - 6.f,
+                  r * 2.f, 4.f, hp / maxHp, sf::Color(255, 100, 50));
 }
 
 bool         WaterMine::isReady()                       const { return ready; }

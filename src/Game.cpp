@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "AudioManager.h"
-#include <cmath>
+#include "GameUtils.h"
 #include <limits>
 #include <algorithm>
 
@@ -86,8 +86,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
         sellMineIdx  = -1;
         for (auto& t : towers) t.setShowRange(false);
         for (int i = 0; i < (int)towers.size(); i++) {
-            sf::Vector2f d = towers[i].getPosition() - mousePos;
-            if (std::sqrt(d.x*d.x + d.y*d.y) < 14.f) {
+            if (dist(towers[i].getPosition(), mousePos) < 14.f) {
                 sellTowerIdx  = i;
                 towers[i].setShowRange(true);
                 sf::Vector2f p = towers[i].getPosition();
@@ -97,8 +96,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
         }
         if (sellTowerIdx == -1) {
             for (int i = 0; i < (int)waterMines.size(); i++) {
-                sf::Vector2f d = waterMines[i].getPosition() - mousePos;
-                if (std::sqrt(d.x*d.x + d.y*d.y) < 14.f) {
+                if (dist(waterMines[i].getPosition(), mousePos) < 14.f) {
                     sellMineIdx   = i;
                     sf::Vector2f p = waterMines[i].getPosition();
                     sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
@@ -176,8 +174,7 @@ void Game::processEvent(const sf::Event& event, sf::RenderWindow& window) {
             // Soldier ordering: if a cornucopia is selected, click inside radius moves soldier
             if (!handled && selectedCornIdx >= 0) {
                 sf::Vector2f cornPos = cornucopias[selectedCornIdx].getPosition();
-                sf::Vector2f d       = mousePos - cornPos;
-                if (std::sqrt(d.x*d.x + d.y*d.y) <= Soldier::PATROL_RADIUS) {
+                if (dist(mousePos, cornPos) <= Soldier::PATROL_RADIUS) {
                     cornucopias[selectedCornIdx].orderSoldierTo(mousePos);
                     handled = true;
                 } else {
@@ -244,7 +241,7 @@ void Game::update(float dt) {
     }
     if (hud.cycleJustCompleted()) {
         waveNumber++;
-        hud.update(dt, waterPoints, waveNumber, true, activeCount, total);
+        hud.update(0.f, waterPoints, waveNumber, true, activeCount, total);
     }
 
     for (auto& c : cornucopias) c.update(dt);
@@ -261,15 +258,11 @@ void Game::update(float dt) {
         if (b.isExpired()) continue;
         for (auto& e : enemies) {
             if (!e.isAlive()) continue;
-            sf::Vector2f d    = b.getPosition() - e.getPosition();
-            float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-            if (dist < 12.f) {
+            if (dist(b.getPosition(), e.getPosition()) < 12.f) {
                 if (b.getAoeRadius() > 0.f) {
                     for (auto& ae : enemies) {
                         if (!ae.isAlive()) continue;
-                        sf::Vector2f ad    = b.getPosition() - ae.getPosition();
-                        float        adist = std::sqrt(ad.x*ad.x + ad.y*ad.y);
-                        if (adist <= b.getAoeRadius()) {
+                        if (dist(b.getPosition(), ae.getPosition()) <= b.getAoeRadius()) {
                             ae.takeDamage(b.getDamage());
                             ae.applySlow(b.getSlowFactor(), b.getSlowDuration());
                         }
@@ -469,60 +462,41 @@ void Game::handlePlacement(sf::Vector2i tile) {
     AudioManager::get().play("construction");
 }
 
-sf::Vector2f Game::nearestTargetPos(sf::Vector2f from) const {
-    sf::Vector2f best    = from;
-    float        minDist = std::numeric_limits<float>::max();
-
-    for (const auto& c : cornucopias) {
-        if (!c.isActive()) continue;
-        sf::Vector2f d    = c.getPosition() - from;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; best = c.getPosition(); }
-    }
-    for (const auto& t : towers) {
-        if (t.isDestroyed()) continue;
-        sf::Vector2f d    = t.getPosition() - from;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; best = t.getPosition(); }
-    }
-    for (const auto& wm : waterMines) {
-        if (wm.isDestroyed()) continue;
-        sf::Vector2f d    = wm.getPosition() - from;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; best = wm.getPosition(); }
-    }
-    return best;
-}
-
-void Game::damageNearestTarget(sf::Vector2f from, float damage) {
+Game::NearestTarget Game::findNearestTarget(sf::Vector2f from) const {
+    NearestTarget result;
     float minDist = std::numeric_limits<float>::max();
-    int   cornIdx = -1;
-    int   towIdx  = -1;
-    int wmIdx = -1;
 
     for (int i = 0; i < (int)cornucopias.size(); i++) {
         if (!cornucopias[i].isActive()) continue;
-        sf::Vector2f d    = cornucopias[i].getPosition() - from;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; cornIdx = i; towIdx = -1; wmIdx = -1; }
+        float d = dist(cornucopias[i].getPosition(), from);
+        if (d < minDist) { minDist = d; result = {i, -1, -1}; }
     }
     for (int i = 0; i < (int)towers.size(); i++) {
         if (towers[i].isDestroyed()) continue;
-        sf::Vector2f d    = towers[i].getPosition() - from;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; towIdx = i; cornIdx = -1; wmIdx = -1; }
+        float d = dist(towers[i].getPosition(), from);
+        if (d < minDist) { minDist = d; result = {-1, i, -1}; }
     }
-
     for (int i = 0; i < (int)waterMines.size(); i++) {
         if (waterMines[i].isDestroyed()) continue;
-        sf::Vector2f d    = waterMines[i].getPosition() - from;
-        float        dist = std::sqrt(d.x*d.x + d.y*d.y);
-        if (dist < minDist) { minDist = dist; wmIdx = i; cornIdx = -1; towIdx = -1; }
+        float d = dist(waterMines[i].getPosition(), from);
+        if (d < minDist) { minDist = d; result = {-1, -1, i}; }
     }
+    return result;
+}
 
-    if (cornIdx >= 0) cornucopias[cornIdx].takeDamage(damage);
-    else if (towIdx >= 0) towers[towIdx].takeDamage(damage);
-    else if (wmIdx  >= 0) waterMines[wmIdx].takeDamage(damage);
+sf::Vector2f Game::nearestTargetPos(sf::Vector2f from) const {
+    NearestTarget r = findNearestTarget(from);
+    if (r.cornIdx >= 0) return cornucopias[r.cornIdx].getPosition();
+    if (r.towIdx  >= 0) return towers[r.towIdx].getPosition();
+    if (r.wmIdx   >= 0) return waterMines[r.wmIdx].getPosition();
+    return from;
+}
+
+void Game::damageNearestTarget(sf::Vector2f from, float damage) {
+    NearestTarget r = findNearestTarget(from);
+    if (r.cornIdx >= 0) cornucopias[r.cornIdx].takeDamage(damage);
+    else if (r.towIdx >= 0) towers[r.towIdx].takeDamage(damage);
+    else if (r.wmIdx  >= 0) waterMines[r.wmIdx].takeDamage(damage);
 }
 
 

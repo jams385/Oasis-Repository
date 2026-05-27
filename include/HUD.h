@@ -12,7 +12,6 @@ public:
     void draw(sf::RenderWindow& window);
 
     TowerType getSelectedTower() const;
-    int       getSelectedCost()  const;
     bool      handleClick(sf::Vector2f mousePos);
     void      deselect();
     bool      hasSelection() const;

@@ -26,11 +26,6 @@ void EnemySpawner::update(float dt, std::vector<Enemy>& enemies, int waveNumber)
     }
 }
 
-void EnemySpawner::setSpawnInterval(float seconds) {
-    spawnInterval = seconds;
-}
-
-
 sf::Vector2f EnemySpawner::randomEdgePosition() {
     int edge = rand() % 4;
 

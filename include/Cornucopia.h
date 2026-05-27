@@ -27,14 +27,9 @@ public:
     void drawSoldier(sf::RenderWindow& window);
     void drawSoldierRadius(sf::RenderWindow& window);
     void orderSoldierTo(sf::Vector2f worldPos);
-    bool soldierContainsPoint(sf::Vector2f p) const;
-    bool hasSoldier()                         const;
-
-    bool         isBroken()  const;
-    bool         isActive()  const;
+    bool         isBroken()    const;
+    bool         isActive()    const;
     sf::Vector2f getPosition() const;
-    float        getHp()       const;
-    float        getMaxHp()    const;
 
 private:
     sf::Vector2f       position;
