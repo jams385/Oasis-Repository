@@ -50,6 +50,17 @@ if(WIN32)
         $<TARGET_RUNTIME_DLLS:Oasis>
         $<TARGET_FILE_DIR:Oasis>
         COMMAND_EXPAND_LISTS)
+
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(OPENAL_DLL "${sfml_SOURCE_DIR}/extlibs/bin/x64/openal32.dll")
+    else()
+        set(OPENAL_DLL "${sfml_SOURCE_DIR}/extlibs/bin/x86/openal32.dll")
+    endif()
+
+    add_custom_command(TARGET Oasis POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${OPENAL_DLL}"
+        $<TARGET_FILE_DIR:Oasis>)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Oasis)
