@@ -113,8 +113,11 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
         cfg.slowDuration = slowDuration;
         cfg.shape        = bulletShape;
         bullets.emplace_back(position, dir * bulletSpeed, cfg);
-        if (type == TowerType::WaterTower)
-            AudioManager::get().play("water_tower_shot", 60.f);
+
+        if (type == TowerType::WaterTower){
+            AudioManager::get().play("water_tower_shot", 15.f);
+        }
+            
         burstShotsLeft--;
         burstTimer = burstDelay;
     }
