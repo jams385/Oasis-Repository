@@ -29,6 +29,7 @@ add_executable(Oasis
     src/SpriteManager.cpp
     src/Cutscene.cpp
     src/AssetLoader.cpp
+    src/Pathfinder.cpp
 )
 
 target_include_directories(Oasis PRIVATE include)

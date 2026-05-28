@@ -345,7 +345,7 @@ void Game::update(float dt) {
     // Enemy movement and attacks
     for (auto& e : enemies) {
         if (!e.isAlive()) continue;
-        e.update(dt, nearestTargetPos(e.getPosition()));
+        e.update(dt, nearestTargetPos(e.getPosition()), map);
         if (e.consumeAttack())
             damageNearestTarget(e.getPosition(), e.getDamage());
     }
