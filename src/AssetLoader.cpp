@@ -21,6 +21,8 @@ void AssetLoader::loadSounds() {
     AudioManager::get().loadSound("construction", "assets/audio/construction.wav");
     AudioManager::get().loadSound("flute_start",  "assets/audio/Flute_start.wav");
     AudioManager::get().loadSound("cutscene_sfx",  "assets/audio/OasisCutscene.ogg");
+    AudioManager::get().loadSound("WaterMine_Collect",  "assets/audio/WaterMine_Collect.wav");
+    AudioManager::get().loadSound("WaterMine_Collect_25",  "assets/audio/WaterMine_Collect2.wav");
 
     AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
 }

@@ -98,7 +98,14 @@ int WaterMine::collect() {
     ready        = false;
     harvestTimer = 0.f;
 
-    int amount = (rand() % 10 < 2) ? 25 : 10;  // 20% rare
+    int amount = 0;
+
+    if(rand() % 10 < 2){
+
+        AudioManager::get().play("WaterMine_Collect_25");
+        amount = 25;
+
+    } else { amount = 10; AudioManager::get().play("WaterMine_Collect");}
 
     popupAmount = amount;
     popupTimer  = 1.2f;
