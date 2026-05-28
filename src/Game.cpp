@@ -107,6 +107,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                 towers[i].setShowRange(true);
                 sf::Vector2f p = towers[i].getPosition();
                 sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
+                AudioManager::get().play("click_tower", 50.f);
                 break;
             }
         }
@@ -116,6 +117,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                     sellMineIdx   = i;
                     sf::Vector2f p = waterMines[i].getPosition();
                     sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
+                    AudioManager::get().play("click_tower", 50.f);
                     break;
                 }
             }
@@ -187,6 +189,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                     if (c.isBroken() && c.containsPoint(mousePos)) {
                         for (auto& other : cornucopias) other.closePopup();
                         c.openPopup();
+                        AudioManager::get().play("click_tower", 50.f);
                         handled = true;
                         break;
                     }
@@ -209,6 +212,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                 for (int i = 0; i < (int)cornucopias.size(); i++) {
                     if (cornucopias[i].isActive() && cornucopias[i].containsPoint(mousePos)) {
                         selectedCornIdx = (selectedCornIdx == i) ? -1 : i;
+                        AudioManager::get().play("click_tower", 50.f);
                         hud.deselect();
                         handled = true;
                         break;
