@@ -40,4 +40,7 @@ private:
     Phase phase;
     float timer;
     bool  done;
+
+    std::vector<sf::Texture> backgrounds;
+    sf::Sprite backgroundSprite;
 };

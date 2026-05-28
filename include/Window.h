@@ -18,10 +18,11 @@ public:
 
     // Pass-throughs so Game doesn't need to reach into _win directly
     bool isOpen()  const { return _win.isOpen(); }
-    void clear()         { _win.clear(); }
     void display()       { _win.display(); }
     void close()         { _win.close(); }
     void draw(const sf::Drawable& d) { _win.draw(d); }
+    void clear(const sf::Color& color = sf::Color::Black){
+        _win.clear(color);}
 
     // Implicit conversion lets Map/HUD/Tower/etc. take sf::RenderWindow& directly
     operator sf::RenderWindow&() { return _win; }

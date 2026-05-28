@@ -25,6 +25,8 @@ public:
     void render(Window& window);
 
 private:
+    sf::Texture menuBgTexture;
+    sf::Sprite menuBgSprite;
 
     int       windowWidth;
     int       windowHeight;
