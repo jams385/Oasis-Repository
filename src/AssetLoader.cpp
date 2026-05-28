@@ -24,6 +24,8 @@ void AssetLoader::loadSounds() {
     AudioManager::get().loadSound("WaterMine_Collect_25",  "assets/audio/WaterMine_Collect2.wav");
     AudioManager::get().loadSound("water_tower_shot", "assets/audio/WaterTower_Shot.wav");
     AudioManager::get().loadSound("sunbeam_shot",     "assets/audio/sunbeam.wav");
+    AudioManager::get().loadSound("tree_tower_shot",  "assets/audio/TreeTower.wav");
+    AudioManager::get().loadSound("click_tower",      "assets/audio/ClickTower.wav");
 
     AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
 }

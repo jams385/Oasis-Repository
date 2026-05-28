@@ -118,6 +118,8 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
             AudioManager::get().play("water_tower_shot", 15.f);
         else if (type == TowerType::SunBeam)
             AudioManager::get().play("sunbeam_shot", 30.f);
+        else if (type == TowerType::TreeTower)
+            AudioManager::get().play("tree_tower_shot", 50.f);
             
         burstShotsLeft--;
         burstTimer = burstDelay;
