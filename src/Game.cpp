@@ -4,7 +4,7 @@
 #include "AssetLoader.h"
 #include "GameUtils.h"
 #include <limits>
-#include <algorithm>
+#include <algorithm> 
 
 Game::Game(int width, int height)
     : windowWidth(width)
@@ -282,8 +282,10 @@ void Game::update(float dt) {
     bool nowNight = hud.isNight();
     if (nowNight != wasNight) {
         wasNight = nowNight;
-        AudioManager::get().playMusic(nowNight ? "assets/audio/OasisNight.ogg"
-                                               : "assets/audio/OasisDay.ogg");
+        if (nowNight)
+            AudioManager::get().playMusic("assets/audio/OasisNight.ogg", false);
+        else
+            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
     }
     if (hud.cycleJustCompleted()) {
         waveNumber++;
