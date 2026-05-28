@@ -8,7 +8,7 @@ void AssetLoader::loadAll() {
 }
 
 void AssetLoader::loadSprites() {
-    static const std::string MUMMY = "assets/OASIS-GRAPHICS/BLOOD_GOBLIN_SPRITE/";
+    static const std::string MUMMY = "assets/OASIS-GRAPHICS/2-BLOOD_GOBLIN_SPRITE/";
     SpriteManager::get().loadTexture("dust_mummy_0", MUMMY + "1.png");
     SpriteManager::get().loadTexture("dust_mummy_1", MUMMY + "2.png");
     SpriteManager::get().loadTexture("dust_mummy_2", MUMMY + "3.png");

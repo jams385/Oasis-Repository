@@ -26,7 +26,8 @@ private:
         std::string  text;
         unsigned int charSize;
         bool         longGapAfter;
-        std::string  sfx; // empty = no sound
+        std::string  sfx;      // empty = no sound
+        float        holdDur = 0.f; // 0 = use global HOLD
     };
 
     void playLineSfx();

@@ -13,9 +13,9 @@ Cutscene::Cutscene(const sf::Font& font, int windowWidth, int windowHeight)
         { "Fields",                   42, false },
         { "Forests",                  42, false },
         { "Oceans",                   42, false },
-        { "Life",                     42, true  },
+        { "Life",                     42, true,  "", 1.2f },
         { "We have to fix our pasts mistakes", 28, false },
-        { "Restore our fallen cornucopias",    28, false },
+        { "Restore our fallen cornucopias",   28, false, "",1.f },
         { "Build our Oasis",          32, false },
     };
 }
@@ -35,13 +35,14 @@ void Cutscene::update(float dt) {
     if (done) return;
     timer += dt;
 
-    float gapDur = (idx < (int)lines.size() && lines[idx].longGapAfter) ? LONG_GAP : GAP;
+    float gapDur  = (idx < (int)lines.size() && lines[idx].longGapAfter) ? LONG_GAP : GAP;
+    float holdDur = (idx < (int)lines.size() && lines[idx].holdDur > 0.f) ? lines[idx].holdDur : HOLD;
 
     switch (phase) {
     case Phase::FadeIn:
         if (timer >= FADE_IN)  { timer -= FADE_IN;  phase = Phase::Hold;    } break;
     case Phase::Hold:
-        if (timer >= HOLD)     { timer -= HOLD;     phase = Phase::FadeOut; } break;
+        if (timer >= holdDur)  { timer -= holdDur;  phase = Phase::FadeOut; } break;
     case Phase::FadeOut:
         if (timer >= FADE_OUT) { timer -= FADE_OUT; phase = Phase::Gap;     } break;
     case Phase::Gap:
