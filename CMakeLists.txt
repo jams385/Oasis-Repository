@@ -30,6 +30,7 @@ add_executable(Oasis
     src/Cutscene.cpp
     src/AssetLoader.cpp
 )
+
 target_include_directories(Oasis PRIVATE include)
 target_compile_features(Oasis PRIVATE cxx_std_17)
 target_link_libraries(Oasis PRIVATE
