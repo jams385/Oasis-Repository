@@ -26,6 +26,8 @@ void AssetLoader::loadSounds() {
     AudioManager::get().loadSound("sunbeam_shot",     "assets/audio/sunbeam.wav");
     AudioManager::get().loadSound("tree_tower_shot",  "assets/audio/TreeTower.wav");
     AudioManager::get().loadSound("click_tower",      "assets/audio/ClickTower.wav");
+    AudioManager::get().loadSound("win_sound",        "assets/audio/WinSound.wav");
+    AudioManager::get().loadSound("lose_sound",        "assets/audio/LoseSound.wav");
 
     AudioManager::get().playMusic("assets/audio/OasisTheme.ogg");
 }

@@ -277,8 +277,18 @@ void Game::update(float dt) {
     for (const auto& c : cornucopias)
         if (c.isActive()) activeCount++;
 
-    if (activeCount == total) { state = GameState::Won;  return; }
-    if (activeCount == 0)     { state = GameState::Lost; return; }
+    if (activeCount == total) {
+        state = GameState::Won;
+        AudioManager::get().stopMusic();
+        AudioManager::get().play("win_sound", 100.f);
+        return;
+    }
+    if (activeCount == 0){ 
+        state = GameState::Lost; 
+        AudioManager::get().stopMusic();
+        AudioManager::get().play("lose_sound", 100.f);
+        return; 
+    }
 
     AudioManager::get().update();
     hud.update(dt, waterPoints, waveNumber, false, activeCount, total, (int)waterMines.size(), mineLimit());
