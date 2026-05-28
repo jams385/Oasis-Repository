@@ -18,7 +18,7 @@ Game::Game(int width, int height)
     , waveNumber(0)
     , hoveredTile(-1, -1)
 {
-    font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
+    font.loadFromFile("assets/fonts/Minecraft.otf");
     map.loadFromFile("assets/map.txt");
 
     
