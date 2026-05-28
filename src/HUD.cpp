@@ -1,5 +1,6 @@
 #include "HUD.h"
 #include <sstream>
+#include <iostream>
 
 // ── Button layout constants ───────────────────────────────────────────────────
 const float BTN_WIDTH   = 110.f;
@@ -54,12 +55,17 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     mineCountText.setCharacterSize(12);
     mineCountText.setFillColor(sf::Color::White);
 
+    waterTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/2.png");
+    sunTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/3.png");
+    treeTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/4.png");
+    mineTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/6.png");
+
     buildButtons();
 }
 
 // ── Build structure buttons ───────────────────────────────────────────────────
 void HUD::buildButtons() {
-    
+   
     struct ButtonDef {
         TowerType   type;
         std::string name;
@@ -78,35 +84,68 @@ void HUD::buildButtons() {
     float y          = windowHeight - BTN_HEIGHT - BTN_Y_OFFSET;
 
     for (int i = 0; i < (int)defs.size(); i++) {
-        TowerButton btn;
-        btn.type = defs[i].type;
-        int cost = Tower::getCost(defs[i].type);
 
-        float x = startX + i * (BTN_WIDTH + BTN_PADDING);
+    TowerButton btn;
 
-        btn.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
-        btn.shape.setPosition(x, y);
-        btn.shape.setFillColor(defs[i].color);
-        btn.shape.setOutlineColor(sf::Color::White);
-        btn.shape.setOutlineThickness(1.5f);
+    btn.type = defs[i].type;
 
-        btn.nameText.setFont(font);
-        btn.nameText.setString(defs[i].name);
-        btn.nameText.setCharacterSize(14);
-        btn.nameText.setFillColor(sf::Color::White);
-        btn.nameText.setPosition(x + 8.f, y + 6.f);
+    int cost = Tower::getCost(defs[i].type);
 
-        btn.costText.setFont(font);
-        btn.costText.setString("$" + std::to_string(cost));
-        btn.costText.setCharacterSize(13);
-        btn.costText.setFillColor(sf::Color(200, 230, 255));
-        btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
+    float x = startX + i * (BTN_WIDTH + BTN_PADDING);
 
-        btn.selected = false;
+    btn.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
+    btn.shape.setPosition(x, y);
+    btn.shape.setFillColor(sf::Color::Transparent); 
+    btn.shape.setOutlineColor(sf::Color::Transparent);
+    btn.shape.setOutlineThickness(1.5f);
 
-        buttons.push_back(btn);
+    switch (btn.type) {
+
+        case TowerType::WaterTower:
+            btn.iconSprite.setTexture(waterTexture);
+            break;
+
+        case TowerType::SunBeam:
+            btn.iconSprite.setTexture(sunTexture);
+            break;
+
+        case TowerType::TreeTower:
+            btn.iconSprite.setTexture(treeTexture);
+            break;
+
+        case TowerType::WaterMine:
+            btn.iconSprite.setTexture(mineTexture);
+            break;
     }
-}
+
+    sf::FloatRect bounds = btn.iconSprite.getLocalBounds();
+
+    float targetSize = 135.f;
+
+    btn.iconSprite.setScale(
+        targetSize / bounds.width,
+        targetSize / bounds.height
+    );
+
+    btn.iconSprite.setPosition(
+        x + (BTN_WIDTH - targetSize) / 2.f,
+        y + -25.f
+    );
+
+    btn.nameText.setFont(font);
+    btn.nameText.setString(defs[i].name);
+    btn.nameText.setCharacterSize(14);
+    btn.nameText.setFillColor(sf::Color::White);
+    //btn.nameText.setPosition(x + 8.f, y + 6.f);
+
+    // btn.costText.setFont(font);
+    // btn.costText.setString("$" + std::to_string(cost));
+    // btn.costText.setCharacterSize(13);
+    // btn.costText.setFillColor(sf::Color(200, 230, 255));
+    // btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
+    btn.selected = false;
+    buttons.push_back(btn);
+}}
 
 // ── Update ────────────────────────────────────────────────────────────────────
 void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int restoredCount, int totalCornucopias, int mineCount, int mineCap) {
@@ -170,12 +209,22 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
             } else {
                 for (auto& b : buttons) {
                     b.selected = false;
-                    b.shape.setOutlineThickness(1.5f);
+                    b.shape.setOutlineColor(sf::Color::Transparent);
+                    b.shape.setOutlineThickness(0.f);
+                    b.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
                 }
+
                 btn.selected = true;
-                btn.shape.setOutlineThickness(3.f);
+                btn.shape.setOutlineColor(sf::Color::White);
+                btn.shape.setOutlineThickness(4.f);
+
+                sf::FloatRect spriteBounds = btn.iconSprite.getGlobalBounds();
+                btn.shape.setSize({ spriteBounds.width, spriteBounds.height });
+                btn.shape.setPosition(btn.iconSprite.getPosition());
+
                 selectedTower = btn.type;
                 _hasSelection = true;
+                
             }
             return true;
         }
@@ -186,7 +235,13 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
 void HUD::deselect() {
     for (auto& b : buttons) {
         b.selected = false;
-        b.shape.setOutlineThickness(1.5f);
+        b.shape.setOutlineColor(sf::Color::Transparent);
+        b.shape.setOutlineThickness(0.f);
+        b.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
+
+        if (b.shape.getSize().y == BTN_HEIGHT) { 
+            b.shape.setPosition(b.shape.getPosition().x, b.shape.getPosition().y + 25.f);
+        }
     }
     _hasSelection = false;
 }
@@ -252,7 +307,9 @@ void HUD::drawWaveInfo(sf::RenderWindow& window) {
 
 void HUD::drawStructureButtons(sf::RenderWindow& window) {
     for (auto& btn : buttons) {
+
         window.draw(btn.shape);
+        window.draw(btn.iconSprite);
         window.draw(btn.nameText);
         window.draw(btn.costText);
 

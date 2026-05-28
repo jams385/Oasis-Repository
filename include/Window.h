@@ -14,6 +14,8 @@ public:
     static constexpr float ZOOM_MAX  = 4.f;
     static constexpr float PAN_SPEED = 500.f; // screen-space pixels/sec
 
+    sf::View         _worldView;
+
     Window(unsigned width, unsigned height, const std::string& title);
 
     // Pass-throughs so Game doesn't need to reach into _win directly
@@ -37,13 +39,15 @@ public:
     void setWorldView();
     void setHUDView();
 
+    // Scaling and Align Background Sprites for Window
+    void scaleAndCenterSprite(sf::Sprite& sprite) const;
+
     // Map a raw pixel to world or HUD (virtual 1280x720) coordinates
     sf::Vector2f mapPixelToCoords(sf::Vector2i pixel) const; // → world view
     sf::Vector2f mapMouseToHUD(sf::Vector2i pixel)    const; // → HUD view
 
 private:
     sf::RenderWindow _win;
-    sf::View         _worldView;
     sf::View         _hudView;
 
     float        _zoom      = 1.f;

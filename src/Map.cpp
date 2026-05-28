@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-const sf::Color COLOR_EMPTY   = sf::Color( 0, 0, 0);
+const sf::Color COLOR_EMPTY   = sf::Color( 0, 0, 0, 0);
 const sf::Color COLOR_BLOCKED = sf::Color( 40,  60,  40);
 const sf::Color COLOR_TOWER   = sf::Color( 50,  80,  60);
 const sf::Color COLOR_HOVER   = sf::Color(110, 160,  90);
@@ -39,7 +39,7 @@ bool Map::loadFromFile(const std::string& filepath) {
 void Map::draw(sf::RenderWindow& window, sf::Vector2i hoveredTile) {
     sf::RectangleShape tile({(float)TILE_SIZE - 1, (float)TILE_SIZE - 1});
     tile.setOutlineColor(COLOR_GRID);
-    tile.setOutlineThickness(0.5f);
+    tile.setOutlineThickness(0.f);
 
     for (int r = 0; r < GRID_ROWS; r++) {
         for (int c = 0; c < GRID_COLS; c++) {
@@ -84,6 +84,7 @@ sf::Vector2i Map::worldToGrid(sf::Vector2f worldPos) const {
         (int)(worldPos.x / TILE_SIZE),
         (int)(worldPos.y / TILE_SIZE)
     };
+    
 }
 
 sf::Vector2f Map::gridToWorld(sf::Vector2i tile) const {

@@ -51,7 +51,6 @@ void Cutscene::update(float dt) {
             timer -= gapDur;
             idx++;
             if (idx >= (int)backgrounds.size()) done = true;
-            // if (idx >= (int)backgrounds.size()) done = true;
             else phase = Phase::FadeIn;
         }
         break;
@@ -94,17 +93,5 @@ void Cutscene::render(sf::RenderWindow& window) {
 
     
 
-    // const Line& line = lines[idx];
-    // sf::Text text;
-    // text.setFont(font);
-    // text.setString(line.text);
-    // text.setCharacterSize(line.charSize);
-    // text.setFillColor(sf::Color(255, 255, 255, static_cast<sf::Uint8>(alpha)));
 
-    // sf::FloatRect b = text.getLocalBounds();
-    // text.setPosition(
-    //     winW / 2.f - b.left - b.width  / 2.f,
-    //     winH / 2.f - b.top  - b.height / 2.f
-    // );
-    // window.draw(text);
 }

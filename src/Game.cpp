@@ -21,7 +21,23 @@ Game::Game(int width, int height)
     font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
     map.loadFromFile("assets/map.txt");
 
+    //Window Background Sprites
+    menuBgTexture.loadFromFile("assets/OASIS-GRAPHICS/MENU-CUTSCENE_GRAPHICS/2.png");
+    menuBgSprite.setTexture(menuBgTexture);
     
+    winBgTexture.loadFromFile("assets/OASIS-GRAPHICS/WIN_SCREEN.png");
+    winBgSprite.setTexture(winBgTexture);
+
+    loseBgTexture.loadFromFile("assets/OASIS-GRAPHICS/LOSE_SCREEN.png");
+    loseBgSprite.setTexture(loseBgTexture);
+
+    dayBgTexture.loadFromFile("assets/OASIS-GRAPHICS/BACKGROUND_MAIN.png");
+    dayBgSprite.setTexture(dayBgTexture);
+
+    menuBgSprite.setScale(
+        1280.f / menuBgTexture.getSize().x,
+        720.f / menuBgTexture.getSize().y
+    );
 
     AssetLoader::loadAll();
 
@@ -280,6 +296,10 @@ void Game::update(float dt) {
     hud.update(dt, waterPoints, waveNumber, false, activeCount, total, (int)waterMines.size(), mineLimit());
 
     bool nowNight = hud.isNight();
+    //fade
+    float targetAlpha = hud.isNight() ? 120.f : 0.f;
+    darknessAlpha += (targetAlpha - darknessAlpha) * 1.f * dt;
+
     if (nowNight != wasNight) {
         wasNight = nowNight;
         AudioManager::get().playMusic(nowNight ? "assets/audio/OasisNight.ogg"
@@ -379,14 +399,18 @@ void Game::render(Window& window) {
     }
 
     if (state == GameState::Menu) {
+        window.draw(menuBgSprite);
+
         window.setHUDView();
         float centerX = windowWidth / 2.f;
-        drawText(window, font, "OASIS",                centerX, 200.f, 72, sf::Color::White,       true);
-        drawText(window, font, "Press ENTER to start", centerX, 340.f, 28, sf::Color(180,180,180), true);
+        drawText(window, font, "Press ENTER to start", centerX, 400.f, 28, sf::Color(180,180,180), true);
         drawText(window, font, "Version 0.1",          centerX, 500.f, 18, sf::Color(100,100,100), true);
     }
     else if (state == GameState::Playing || state == GameState::Paused) {
         window.setWorldView();
+
+        window.scaleAndCenterSprite(dayBgSprite);
+        window.draw(dayBgSprite);
         bool showHover = hud.hasSelection() && !isAdjacentToCornucopia(hoveredTile);
         map.draw(window, showHover ? hoveredTile : sf::Vector2i(-1, -1));
 
@@ -441,6 +465,22 @@ void Game::render(Window& window) {
                      cx, sellPopupRect.top + 22.f, 13, sf::Color(180, 230, 255), true);
         }
 
+        //if night fade
+        sf::RectangleShape darkness(
+        sf::Vector2f((float)windowWidth, (float)windowHeight)
+        );
+
+        sf::View currentView = window._worldView; 
+        darkness.setSize(currentView.getSize());
+        darkness.setPosition(currentView.getCenter() - currentView.getSize() / 2.f);
+
+        darkness.setFillColor(
+        sf::Color(15, 10, 40, (sf::Uint8)darknessAlpha)
+        );
+
+window.draw(darkness);
+
+        window.draw(darkness);
         window.setHUDView();
         hud.draw(window);
 
@@ -456,17 +496,16 @@ void Game::render(Window& window) {
         }
     }
     else if (state == GameState::Won) {
-        float centerX = windowWidth / 2.f;
-        drawText(window, font, "YOU WIN!",                  centerX, 180.f, 72, sf::Color(255,215,0),   true);
-        drawText(window, font, "The Oasis is restored.",    centerX, 290.f, 32, sf::Color::White,       true);
-        drawText(window, font, "Press ENTER to play again", centerX, 400.f, 24, sf::Color(180,180,180), true);
+        window.scaleAndCenterSprite(winBgSprite);
+        window.draw(winBgSprite);
+       
     }
+
     else if (state == GameState::Lost) {
-        float centerX = windowWidth / 2.f;
-        drawText(window, font, "GAME OVER",                  centerX, 180.f, 72, sf::Color(200,50,50),   true);
-        drawText(window, font, "The last Oasis has fallen.", centerX, 290.f, 32, sf::Color::White,       true);
-        drawText(window, font, "Press ENTER to try again",   centerX, 400.f, 24, sf::Color(180,180,180), true);
+        window.scaleAndCenterSprite(loseBgSprite);
+        window.draw(loseBgSprite);
     }
+
 }
 
 /* ---------------------------------------------------------

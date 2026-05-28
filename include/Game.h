@@ -25,8 +25,12 @@ public:
     void render(Window& window);
 
 private:
-    sf::Texture menuBgTexture;
-    sf::Sprite menuBgSprite;
+    //Background Sprites
+    sf::Texture menuBgTexture;  sf::Sprite menuBgSprite;
+    sf::Texture winBgTexture;  sf::Sprite winBgSprite;
+    sf::Texture loseBgTexture;  sf::Sprite loseBgSprite;
+    sf::Texture dayBgTexture;  sf::Sprite dayBgSprite;
+    float darknessAlpha = 0.f;
 
     int       windowWidth;
     int       windowHeight;

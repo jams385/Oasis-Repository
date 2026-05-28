@@ -57,13 +57,23 @@ private:
     sf::RectangleShape dayNightBar;
     sf::Text           dayNightLabel;
 
+///SAMPLEEEE
+sf::Texture waterTexture;
+sf::Texture sunTexture;
+sf::Texture treeTexture;
+sf::Texture mineTexture;
+//////////
+
     // ── Structure buttons ─────────────────────────────────────────────────────
     struct TowerButton {
-        sf::RectangleShape shape;
-        sf::Text           nameText;
-        sf::Text           costText;
         TowerType          type;
-        bool               selected = false;
+        sf::Text nameText;
+        sf::Text costText;
+        sf::RectangleShape shape;
+        //sf::Texture iconTexture;
+        sf::Sprite  iconSprite;
+        
+        bool selected = false;
     };
     std::vector<TowerButton> buttons;
     TowerType                selectedTower = TowerType::WaterTower;
@@ -75,4 +85,5 @@ private:
     void drawWaveInfo(sf::RenderWindow& window);
     void drawStructureButtons(sf::RenderWindow& window);
     void drawCornucopiaCount(sf::RenderWindow& window);
+    
 };
