@@ -42,9 +42,8 @@ void Game::processEvent(const sf::Event& event, Window& window) {
         if (event.type == sf::Event::KeyPressed &&
             event.key.code == sf::Keyboard::Enter) {
 
-            AudioManager::get().stopMusic();
             AudioManager::get().play("flute_start");
-            AudioManager::get().play("cutscene_sfx");
+            AudioManager::get().playMusic("assets/audio/OasisCutscene.ogg", false);
             cutscene.reset();
             state = GameState::Cutscene;
 
@@ -56,6 +55,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
         if (event.type == sf::Event::KeyPressed) {
             cutscene.skip();
             AudioManager::get().stopAllSounds();
+            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
         }
         return;
     }
