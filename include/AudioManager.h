@@ -2,7 +2,7 @@
 #include <SFML/Audio.hpp>
 #include <string>
 #include <unordered_map>
-#include <vector>
+#include <list>
 
 class AudioManager {
 public:
@@ -22,6 +22,6 @@ private:
     AudioManager();
 
     std::unordered_map<std::string, sf::SoundBuffer> buffers;
-    std::vector<sf::Sound>                           soundPool;
+    std::list<sf::Sound>                             soundPool;
     sf::Music                                        music;
 };

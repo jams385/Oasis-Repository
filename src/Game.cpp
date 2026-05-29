@@ -4,7 +4,7 @@
 #include "AssetLoader.h"
 #include "GameUtils.h"
 #include <limits>
-#include <algorithm>
+#include <algorithm> 
 
 Game::Game(int width, int height)
     : windowWidth(width)
@@ -18,7 +18,7 @@ Game::Game(int width, int height)
     , waveNumber(0)
     , hoveredTile(-1, -1)
 {
-    font.loadFromFile("assets/fonts/desert_road/Desert_Road.otf");
+    font.loadFromFile("assets/fonts/Minecraft.otf");
     map.loadFromFile("assets/map.txt");
 
     //Window Background Sprites
@@ -123,6 +123,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                 towers[i].setShowRange(true);
                 sf::Vector2f p = towers[i].getPosition();
                 sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
+                AudioManager::get().play("click_tower", 50.f);
                 break;
             }
         }
@@ -132,6 +133,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                     sellMineIdx   = i;
                     sf::Vector2f p = waterMines[i].getPosition();
                     sellPopupRect = { p.x - 32.f, p.y - 58.f, 64.f, 42.f };
+                    AudioManager::get().play("click_tower", 50.f);
                     break;
                 }
             }
@@ -203,6 +205,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                     if (c.isBroken() && c.containsPoint(mousePos)) {
                         for (auto& other : cornucopias) other.closePopup();
                         c.openPopup();
+                        AudioManager::get().play("click_tower", 50.f);
                         handled = true;
                         break;
                     }
@@ -225,6 +228,7 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                 for (int i = 0; i < (int)cornucopias.size(); i++) {
                     if (cornucopias[i].isActive() && cornucopias[i].containsPoint(mousePos)) {
                         selectedCornIdx = (selectedCornIdx == i) ? -1 : i;
+                        AudioManager::get().play("click_tower", 50.f);
                         hud.deselect();
                         handled = true;
                         break;
@@ -289,8 +293,18 @@ void Game::update(float dt) {
     for (const auto& c : cornucopias)
         if (c.isActive()) activeCount++;
 
-    if (activeCount == total) { state = GameState::Won;  return; }
-    if (activeCount == 0)     { state = GameState::Lost; return; }
+    if (activeCount == total) {
+        state = GameState::Won;
+        AudioManager::get().stopMusic();
+        AudioManager::get().play("win_sound", 100.f);
+        return;
+    }
+    if (activeCount == 0){ 
+        state = GameState::Lost; 
+        AudioManager::get().stopMusic();
+        AudioManager::get().play("lose_sound", 100.f);
+        return; 
+    }
 
     AudioManager::get().update();
     hud.update(dt, waterPoints, waveNumber, false, activeCount, total, (int)waterMines.size(), mineLimit());
@@ -302,8 +316,10 @@ void Game::update(float dt) {
 
     if (nowNight != wasNight) {
         wasNight = nowNight;
-        AudioManager::get().playMusic(nowNight ? "assets/audio/OasisNight.ogg"
-                                               : "assets/audio/OasisDay.ogg");
+        if (nowNight)
+            AudioManager::get().playMusic("assets/audio/OasisNight.ogg", false);
+        else
+            AudioManager::get().playMusic("assets/audio/OasisDay.ogg");
     }
     if (hud.cycleJustCompleted()) {
         waveNumber++;
@@ -349,7 +365,7 @@ void Game::update(float dt) {
     // Enemy movement and attacks
     for (auto& e : enemies) {
         if (!e.isAlive()) continue;
-        e.update(dt, nearestTargetPos(e.getPosition()));
+        e.update(dt, nearestTargetPos(e.getPosition()), map);
         if (e.consumeAttack())
             damageNearestTarget(e.getPosition(), e.getDamage());
     }

@@ -1,9 +1,7 @@
 #include "AudioManager.h"
 #include <stdexcept>
 
-AudioManager::AudioManager() {
-    soundPool.reserve(16);
-}
+AudioManager::AudioManager() {}
 
 AudioManager& AudioManager::get() {
     static AudioManager instance;
@@ -21,12 +19,7 @@ void AudioManager::play(const std::string& name, float volume) {
     auto it = buffers.find(name);
     if (it == buffers.end()) return;
 
-    // clean finished sounds first to keep pool small
-    soundPool.erase(
-        std::remove_if(soundPool.begin(), soundPool.end(),
-            [](const sf::Sound& s){ return s.getStatus() == sf::Sound::Stopped; }),
-        soundPool.end()
-    );
+    soundPool.remove_if([](const sf::Sound& s){ return s.getStatus() == sf::Sound::Stopped; });
 
     soundPool.emplace_back(it->second);
     soundPool.back().setVolume(volume);
@@ -54,9 +47,5 @@ void AudioManager::stopAllSounds() {
 }
 
 void AudioManager::update() {
-    soundPool.erase(
-        std::remove_if(soundPool.begin(), soundPool.end(),
-            [](const sf::Sound& s){ return s.getStatus() == sf::Sound::Stopped; }),
-        soundPool.end()
-    );
+    soundPool.remove_if([](const sf::Sound& s){ return s.getStatus() == sf::Sound::Stopped; });
 }

@@ -1,4 +1,6 @@
 #include "Enemy.h"
+#include "Map.h"
+#include "Pathfinder.h"
 #include "AudioManager.h"
 #include "GameUtils.h"
 
@@ -86,7 +88,7 @@ void Enemy::initStats() {
 }
 
 
-void Enemy::update(float dt, sf::Vector2f target) {
+void Enemy::update(float dt, sf::Vector2f target, const Map& map) {
     if (!alive) return;
 
     animSprite.update(dt);
@@ -94,18 +96,37 @@ void Enemy::update(float dt, sf::Vector2f target) {
     if (slowTimer > 0.f) slowTimer -= dt;
     else                 slowFactor = 1.f;
 
-    sf::Vector2f dir = target - position;
-    float        d   = dist(target, position);
+    // Recompute path if stale or target moved to a different tile
+    pathAge_ += dt;
+    if (pathAge_ >= PATH_RECOMPUTE || dist(target, lastTarget_) > TILE_SIZE * 2.f) {
+        waypoints_   = Pathfinder::findPath(map, position, target);
+        waypointIdx_ = 0;
+        pathAge_     = 0.f;
+        lastTarget_  = target;
+    }
 
-    if (d <= ATTACK_RANGE) {
+    // Advance along waypoints
+    sf::Vector2f moveTarget = target;
+    if (!waypoints_.empty() && waypointIdx_ < (int)waypoints_.size()) {
+        moveTarget = waypoints_[waypointIdx_];
+        if (dist(position, moveTarget) < TILE_SIZE * 0.6f)
+            waypointIdx_++;
+    }
+
+    float distToTarget = dist(target, position);
+    if (distToTarget <= ATTACK_RANGE) {
         attacking = true;
         if (attackTimer > 0.f) attackTimer -= dt;
     } else {
         attacking   = false;
         attackTimer = 0.f;
-        dir        /= d;
-        position   += dir * speed * slowFactor * dt;
-        shape.setPosition(position);
+        sf::Vector2f dir = moveTarget - position;
+        float        d   = dist(moveTarget, position);
+        if (d > 1.f) {
+            dir      /= d;
+            position += dir * speed * slowFactor * dt;
+            shape.setPosition(position);
+        }
     }
 }
 

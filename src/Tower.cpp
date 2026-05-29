@@ -29,7 +29,7 @@ void Tower::initStats() {
 
         case TowerType::WaterTower:
             range         = 150.f;
-            damage        = 7.f;
+            damage        = 5.f;
             burstSize     = 3;
             burstDelay    = 0.12f;
             burstCooldown = 2.0f;
@@ -113,8 +113,14 @@ void Tower::update(float dt, const std::vector<Enemy>& enemies, std::vector<Bull
         cfg.slowDuration = slowDuration;
         cfg.shape        = bulletShape;
         bullets.emplace_back(position, dir * bulletSpeed, cfg);
+
         if (type == TowerType::WaterTower)
-            AudioManager::get().play("water_tower_shot", 60.f);
+            AudioManager::get().play("water_tower_shot", 15.f);
+        else if (type == TowerType::SunBeam)
+            AudioManager::get().play("sunbeam_shot", 30.f);
+        else if (type == TowerType::TreeTower)
+            AudioManager::get().play("tree_tower_shot", 50.f);
+            
         burstShotsLeft--;
         burstTimer = burstDelay;
     }

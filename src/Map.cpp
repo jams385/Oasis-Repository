@@ -60,6 +60,7 @@ void Map::draw(sf::RenderWindow& window, sf::Vector2i hoveredTile) {
     }
 }
 
+/* Used for A* Pathfinding and Build Checking */
 bool Map::isPlaceable(sf::Vector2i tile) const {
     if (tile.x < 0 || tile.x >= GRID_COLS) return false;
     if (tile.y < 0 || tile.y >= GRID_ROWS)  return false;
