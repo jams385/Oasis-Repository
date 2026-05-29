@@ -65,18 +65,16 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
 
 // ── Build structure buttons ───────────────────────────────────────────────────
 void HUD::buildButtons() {
-   
     struct ButtonDef {
-        TowerType   type;
-        std::string name;
-        sf::Color   color;
+        TowerType    type;
+        sf::Texture* texture;
     };
 
     std::vector<ButtonDef> defs = {
-        { TowerType::WaterTower, "Water\nTower", sf::Color(30, 100, 200)  },
-        { TowerType::SunBeam,    "Sun\nBeam",    sf::Color(200, 160, 30)  },
-        { TowerType::TreeTower,  "Tree\nTower",  sf::Color(34, 120, 34)   },
-        { TowerType::WaterMine,  "Water\nMine",  sf::Color(0, 130, 130)   },
+        { TowerType::WaterTower, &waterTexture },
+        { TowerType::SunBeam,    &sunTexture   },
+        { TowerType::TreeTower,  &treeTexture  },
+        { TowerType::WaterMine,  &mineTexture  },
     };
 
     float totalWidth = defs.size() * BTN_WIDTH + (defs.size() - 1) * BTN_PADDING;
@@ -84,68 +82,26 @@ void HUD::buildButtons() {
     float y          = windowHeight - BTN_HEIGHT - BTN_Y_OFFSET;
 
     for (int i = 0; i < (int)defs.size(); i++) {
+        TowerButton btn;
+        btn.type = defs[i].type;
 
-    TowerButton btn;
+        float x = startX + i * (BTN_WIDTH + BTN_PADDING);
 
-    btn.type = defs[i].type;
+        btn.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
+        btn.shape.setPosition(x, y);
+        btn.shape.setFillColor(sf::Color::Transparent);
+        btn.shape.setOutlineColor(sf::Color::Transparent);
+        btn.shape.setOutlineThickness(1.5f);
 
-    int cost = Tower::getCost(defs[i].type);
+        btn.iconSprite.setTexture(*defs[i].texture);
+        sf::FloatRect bounds = btn.iconSprite.getLocalBounds();
+        btn.iconSprite.setScale(BTN_WIDTH / bounds.width, BTN_HEIGHT / bounds.height);
+        btn.iconSprite.setPosition(x, y);
 
-    float x = startX + i * (BTN_WIDTH + BTN_PADDING);
-
-    btn.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
-    btn.shape.setPosition(x, y);
-    btn.shape.setFillColor(sf::Color::Transparent); 
-    btn.shape.setOutlineColor(sf::Color::Transparent);
-    btn.shape.setOutlineThickness(1.5f);
-
-    switch (btn.type) {
-
-        case TowerType::WaterTower:
-            btn.iconSprite.setTexture(waterTexture);
-            break;
-
-        case TowerType::SunBeam:
-            btn.iconSprite.setTexture(sunTexture);
-            break;
-
-        case TowerType::TreeTower:
-            btn.iconSprite.setTexture(treeTexture);
-            break;
-
-        case TowerType::WaterMine:
-            btn.iconSprite.setTexture(mineTexture);
-            break;
+        btn.selected = false;
+        buttons.push_back(btn);
     }
-
-    sf::FloatRect bounds = btn.iconSprite.getLocalBounds();
-
-    float targetSize = 135.f;
-
-    btn.iconSprite.setScale(
-        targetSize / bounds.width,
-        targetSize / bounds.height
-    );
-
-    btn.iconSprite.setPosition(
-        x + (BTN_WIDTH - targetSize) / 2.f,
-        y + -25.f
-    );
-
-    btn.nameText.setFont(font);
-    btn.nameText.setString(defs[i].name);
-    btn.nameText.setCharacterSize(14);
-    btn.nameText.setFillColor(sf::Color::White);
-    //btn.nameText.setPosition(x + 8.f, y + 6.f);
-
-    // btn.costText.setFont(font);
-    // btn.costText.setString("$" + std::to_string(cost));
-    // btn.costText.setCharacterSize(13);
-    // btn.costText.setFillColor(sf::Color(200, 230, 255));
-    // btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
-    btn.selected = false;
-    buttons.push_back(btn);
-}}
+}
 
 // ── Update ────────────────────────────────────────────────────────────────────
 void HUD::update(float dt, int waterPoints, int waveNumber, bool newWave, int restoredCount, int totalCornucopias, int mineCount, int mineCap) {
@@ -211,16 +167,11 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
                     b.selected = false;
                     b.shape.setOutlineColor(sf::Color::Transparent);
                     b.shape.setOutlineThickness(0.f);
-                    b.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
                 }
 
                 btn.selected = true;
                 btn.shape.setOutlineColor(sf::Color::White);
                 btn.shape.setOutlineThickness(4.f);
-
-                sf::FloatRect spriteBounds = btn.iconSprite.getGlobalBounds();
-                btn.shape.setSize({ spriteBounds.width, spriteBounds.height });
-                btn.shape.setPosition(btn.iconSprite.getPosition());
 
                 selectedTower = btn.type;
                 _hasSelection = true;
@@ -237,11 +188,6 @@ void HUD::deselect() {
         b.selected = false;
         b.shape.setOutlineColor(sf::Color::Transparent);
         b.shape.setOutlineThickness(0.f);
-        b.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
-
-        if (b.shape.getSize().y == BTN_HEIGHT) { 
-            b.shape.setPosition(b.shape.getPosition().x, b.shape.getPosition().y + 25.f);
-        }
     }
     _hasSelection = false;
 }
@@ -310,8 +256,6 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
 
         window.draw(btn.shape);
         window.draw(btn.iconSprite);
-        window.draw(btn.nameText);
-        window.draw(btn.costText);
 
         if (btn.type == TowerType::WaterMine) {
             sf::Vector2f pos  = btn.shape.getPosition();
