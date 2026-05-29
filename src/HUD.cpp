@@ -17,9 +17,7 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     currencyText.setFillColor(sf::Color(39, 12, 32));
     currencyTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/1.png");
     currencySprite.setTexture(currencyTexture);
-    currencySprite.setScale(1.7f, 2.2f); 
-    
-    
+    currencySprite.setScale(1.7f, 2.2f);
 
     // Small wave label - top middle
     waveText.setFont(font);
@@ -62,7 +60,8 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     waterTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/2.png");
     sunTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/3.png");
     treeTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/4.png");
-    mineTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/6.png");
+    mineTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/5.png");
+    mineDisabledTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/6.png");
 
     buildButtons();
 }
@@ -162,7 +161,10 @@ void HUD::reset() {
 // ── Handle button clicks ──────────────────────────────────────────────────────
 bool HUD::handleClick(sf::Vector2f mousePos) {
     for (auto& btn : buttons) {
-        if (btn.type == TowerType::WaterMine && mineCount >= mineCap) continue;
+        if (btn.type == TowerType::WaterMine && mineCount >= mineCap) {
+            if (btn.shape.getGlobalBounds().contains(mousePos)) return true;
+            continue;
+        }
         if (btn.shape.getGlobalBounds().contains(mousePos)) {
             if (btn.selected) {
                 deselect();
@@ -263,25 +265,25 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
     for (auto& btn : buttons) {
 
         window.draw(btn.shape);
-        window.draw(btn.iconSprite);
 
         if (btn.type == TowerType::WaterMine) {
             sf::Vector2f pos  = btn.shape.getPosition();
             sf::Vector2f size = btn.shape.getSize();
+
+            if (mineCount >= mineCap)
+                btn.iconSprite.setTexture(mineDisabledTexture);
+            else
+                btn.iconSprite.setTexture(mineTexture);
+
+            window.draw(btn.iconSprite);
 
             // Mine count label (bottom-right of button)
             mineCountText.setString(std::to_string(mineCount) + "/" + std::to_string(mineCap));
             mineCountText.setPosition(pos.x + size.x - mineCountText.getLocalBounds().width - 6.f,
                                       pos.y + size.y - 22.f);
             window.draw(mineCountText);
-
-            // Dark overlay when at cap
-            if (mineCount >= mineCap) {
-                sf::RectangleShape overlay(size);
-                overlay.setPosition(pos);
-                overlay.setFillColor(sf::Color(0, 0, 0, 160));
-                window.draw(overlay);
-            }
+        } else {
+            window.draw(btn.iconSprite);
         }
     }
 }

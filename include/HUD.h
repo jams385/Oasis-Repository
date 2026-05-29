@@ -63,6 +63,7 @@ private:
     sf::Texture sunTexture;
     sf::Texture treeTexture;
     sf::Texture mineTexture;
+    sf::Texture mineDisabledTexture;
 
     // ── Structure buttons ─────────────────────────────────────────────────────
     struct TowerButton {
