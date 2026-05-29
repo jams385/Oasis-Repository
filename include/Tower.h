@@ -24,11 +24,7 @@ private:
     TowerType       type;
     sf::Vector2f    position;
 
-    sf::Texture texture;  sf::Sprite sprite;
-    // sf::Texture waterTowerTexture;  sf::Sprite  waterTowerSprite;
-    // sf::Texture sunBeamTexture; sf::Sprite  sunBeamSprite;
-    // sf::Texture treeTowerTexture;   sf::Sprite  treeTowerSprite;
-    // sf::Texture waterMineTexture; sf::Sprite  waterMineSprite;
+    sf::Sprite sprite;
 
 
     float           hp            = 100.f;

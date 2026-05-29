@@ -1,8 +1,8 @@
 #include "Cornucopia.h"
 #include "AudioManager.h"
 #include "GameUtils.h"
+#include "SpriteManager.h"
 
-static const float BODY_W  = 20.f;
 static const float BODY_H  = 27.f;
 static const float MAX_HP  = 300.f;
 static const float POPUP_W = 150.f;
@@ -16,32 +16,20 @@ Cornucopia::Cornucopia(sf::Vector2f worldPos)
     , popupOpen(false)
 {
 
-    cornucopiaMainTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png");
-    cornucopiaMiniTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
-    cornucopiaMainSprite.setTexture(cornucopiaMainTexture);
-    cornucopiaMiniSprite.setTexture(cornucopiaMiniTexture);
-    
-        // // MAIN CORNUCOPIA
-        // cornucopiaMainTexture.loadFromFile(
-        //     "assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png"
-        // );
-        // cornucopiaMainSprite.setTexture(cornucopiaMainTexture);
-        // cornucopiaMainSprite.setOrigin(
-        //     cornucopiaMainTexture.getSize().x / 2.f,
-        //     cornucopiaMainTexture.getSize().y / 2.f
-        // );
-        // cornucopiaMainSprite.setPosition(position);
-        // cornucopiaMainSprite.setScale(0.7f, 0.7f);
-
-        // // MINI CORNUCOPIA
-        // cornucopiaMiniTexture.loadFromFile(
-        //     "assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
-        // cornucopiaMiniSprite.setTexture(cornucopiaMiniTexture);
-        // cornucopiaMiniSprite.setOrigin(
-        //     cornucopiaMiniTexture.getSize().x / 2.f,
-        //     cornucopiaMiniTexture.getSize().y / 2.f);
-        // cornucopiaMiniSprite.setPosition(position);
-        // cornucopiaMiniSprite.setScale(0.6f, 0.6f);
+    {
+        sf::Texture& t = SpriteManager::get().getTexture("cornucopia_main");
+        cornucopiaMainSprite.setTexture(t, true);
+        cornucopiaMainSprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
+        cornucopiaMainSprite.setPosition(position);
+        cornucopiaMainSprite.setScale(1.5f, 1.5f);
+    }
+    {
+        sf::Texture& t = SpriteManager::get().getTexture("cornucopia_mini");
+        cornucopiaMiniSprite.setTexture(t, true);
+        cornucopiaMiniSprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
+        cornucopiaMiniSprite.setPosition(position);
+        cornucopiaMiniSprite.setScale(0.5f, 0.5f);
+    }
 
 
     float popupX = position.x - POPUP_W / 2.f;
@@ -55,26 +43,12 @@ Cornucopia::Cornucopia(sf::Vector2f worldPos)
     applyVisual();
 }
 
-// void Cornucopia::applyVisual()
-// {
-//     if (cornState == CornucopiaState::Broken)
-//     {
-//         cornucopiaMiniTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
-//         cornucopiaMainSprite.setScale(0.6f, 0.6f);
-//     }
-//     else
-//     {
-//         cornucopiaMiniTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png");
-//         cornucopiaMainSprite.setScale(0.7f, 0.7f);
-//     }
-//     cornucopiaMainSprite.setTexture(cornucopiaMiniTexture);
-// }
-
 void Cornucopia::applyVisual()
 {
     if (cornState == CornucopiaState::Broken)
-    {cornucopiaMiniSprite.setColor(sf::Color(150, 150, 150));} // grey tint
-
+        cornucopiaMiniSprite.setColor(sf::Color(150, 150, 150)); // grey tint
+    else
+        cornucopiaMainSprite.setColor(sf::Color::White);
 }
 
 void Cornucopia::restore() {
@@ -93,10 +67,6 @@ bool Cornucopia::isPopupOpen() const { return popupOpen; }
 sf::FloatRect Cornucopia::getPopupBounds() const {
     return popupBox.getGlobalBounds();
 }
-
-// bool Cornucopia::containsPoint(sf::Vector2f p) const {
-//     return body.getGlobalBounds().contains(p) || top.getGlobalBounds().contains(p);
-// }
 
 bool Cornucopia::containsPoint(sf::Vector2f p) const
 {
@@ -128,12 +98,6 @@ void Cornucopia::draw(sf::RenderWindow& window)
         window.draw(popupBox);
 }
 
-
-// void Cornucopia::drawHpBar(sf::RenderWindow& window) {
-//     float barW = BODY_W + 9.f;
-//     drawHealthBar(window, position.x - barW / 2.f, position.y - BODY_H / 2.f - 16.f,
-//                   barW, 5.f, hp / maxHp, sf::Color(255, 165, 0));
-// }
 
 void Cornucopia::drawHpBar(sf::RenderWindow& window)
 {

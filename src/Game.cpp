@@ -503,7 +503,7 @@ void Game::render(Window& window) {
     else if (state == GameState::Playing || state == GameState::Paused) {
         window.setWorldView();
 
-        window.scaleAndCenterSprite(dayBgSprite);
+        window.scaleAndCenterSprite(dayBgSprite, 1.3f);
         window.draw(dayBgSprite);
         bool showHover = hud.hasSelection() && !isAdjacentToCornucopia(hoveredTile);
         map.draw(window, showHover ? hoveredTile : sf::Vector2i(-1, -1));

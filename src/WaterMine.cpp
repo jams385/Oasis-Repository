@@ -103,7 +103,6 @@ int WaterMine::collect() {
     if(rand() % 10 < 2){
 
         AudioManager::get().play("WaterMine_Collect_25");
-        AudioManager::get().play("WaterMine_Collect_25");
         amount = 25;
 
     } else { amount = 10; AudioManager::get().play("WaterMine_Collect");}

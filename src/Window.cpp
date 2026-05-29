@@ -148,7 +148,7 @@ sf::Vector2f Window::mapMouseToHUD(sf::Vector2i pixel) const {
 
 
 // ── Scale Window BG ───────────────────────────────────────────────────────────
-void Window::scaleAndCenterSprite(sf::Sprite& sprite) const {
+void Window::scaleAndCenterSprite(sf::Sprite& sprite, float zoom) const {
 
     sf::FloatRect bounds = sprite.getLocalBounds();
     if (bounds.width == 0.f || bounds.height == 0.f)
@@ -157,7 +157,7 @@ void Window::scaleAndCenterSprite(sf::Sprite& sprite) const {
     float scale = std::max(
         VIRTUAL_W / bounds.width,
         VIRTUAL_H / bounds.height
-    );
+    ) * zoom;
 
     sprite.setScale(scale, scale);
     sprite.setPosition(

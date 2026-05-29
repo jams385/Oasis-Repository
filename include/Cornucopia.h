@@ -43,11 +43,8 @@ private:
     CornucopiaState    cornState;
     bool               popupOpen;
 
-    sf::Texture cornucopiaMiniTexture; sf::Sprite  cornucopiaMiniSprite;
-    sf::Texture cornucopiaMainTexture;  sf::Sprite  cornucopiaMainSprite;
-
-    // sf::RectangleShape body;
-    // sf::ConvexShape    top;
+    sf::Sprite cornucopiaMiniSprite;
+    sf::Sprite cornucopiaMainSprite;
     sf::RectangleShape popupBox;
     Soldier            soldier;
 

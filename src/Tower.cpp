@@ -1,17 +1,12 @@
 #include "Tower.h"
 #include "AudioManager.h"
 #include "GameUtils.h"
-#include <iostream>
+#include "SpriteManager.h"
 
 Tower::Tower(sf::Vector2f worldPos, TowerType type)
     : type(type)
     , position(worldPos)
 {
-    // shape.setRadius(10.f);
-    // shape.setOrigin(10.f, 10.f);
-    // shape.setOutlineThickness(2.f);
-    // shape.setPosition(position);
-
     initStats();
 
     rangeCircle.setRadius(range);
@@ -28,38 +23,21 @@ Tower::Tower(sf::Vector2f worldPos, TowerType type)
 void Tower::initStats() {
     switch (type) {
 
-        case TowerType::WaterTower:
+        case TowerType::WaterTower: {
             range         = 150.f;
             damage        = 5.f;
             burstSize     = 3;
             burstDelay    = 0.12f;
             burstCooldown = 2.0f;
             maxHp         = 150.f;
-            
-                texture.loadFromFile("C:/Users/CHENILLE ZYNE/Oasis-Repository/assets/OASIS-GRAPHICS/WATER_TOWER_2.png");
-                std::cout << texture.getSize().x
-          << " x "
-          << texture.getSize().y
-          << std::endl;
-                sprite.setTexture(texture);
-                sprite.setOrigin(
-                    texture.getSize().x / 2.f,
-                    texture.getSize().y / 2.f
-                );
-                sprite.setPosition(position);
-                sprite.setScale(0.01f, 0.01f);
-
-            // waterTowerTexture.loadFromFile("assets/OASIS-GRAPHICS/WATER_TOWER_2.png");
-            // waterTowerSprite.setTexture(waterTowerTexture);
-            // waterTowerSprite.setOrigin(
-            //     waterTowerTexture.getSize().x / 2.f,
-            //     waterTowerTexture.getSize().y / 2.f
-            // );
-            // waterTowerSprite.setPosition(position);
-            // waterTowerSprite.setScale(0.22f, 0.22f);
-                       break;
-
-        case TowerType::SunBeam:
+            sf::Texture& t = SpriteManager::get().getTexture("water_tower");
+            sprite.setTexture(t, true);
+            sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
+            sprite.setPosition(position);
+            sprite.setScale(0.15f, 0.15f);
+            break;
+        }
+        case TowerType::SunBeam: {
             range         = 250.f;
             damage        = 45.f;
             bulletSpeed   = 350.f;
@@ -68,27 +46,14 @@ void Tower::initStats() {
             burstDelay    = 0.f;
             burstCooldown = 3.0f;
             maxHp         = 200.f;
-            
-                texture.loadFromFile("assets/OASIS-GRAPHICS/SUN_BEAM_TOWER_2.png");
-                sprite.setTexture(texture);
-                sprite.setOrigin(
-                    texture.getSize().x / 2.f,
-                    texture.getSize().y / 2.f
-                );
-                sprite.setPosition(position);
-                sprite.setScale(0.22f, 0.22f);
-
-            // sunBeamTexture.loadFromFile("assets/OASIS-GRAPHICS/SUN_BEAM_TOWER_2.png");
-            // sunBeamSprite.setTexture(sunBeamTexture);
-            // sunBeamSprite.setOrigin(
-            //     sunBeamTexture.getSize().x / 2.f,
-            //     sunBeamTexture.getSize().y / 2.f
-            // );
-            // sunBeamSprite.setPosition(position);
-            // sunBeamSprite.setScale(0.22f, 0.22f);             // 260x500
+            sf::Texture& t = SpriteManager::get().getTexture("sunbeam_tower");
+            sprite.setTexture(t, true);
+            sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
+            sprite.setPosition(position);
+            sprite.setScale(0.15f, 0.15f);
             break;
-
-        case TowerType::TreeTower:
+        }
+        case TowerType::TreeTower: {
             range         = 130.f;
             damage        = 10.f;
             bulletSpeed   = 200.f;
@@ -99,45 +64,21 @@ void Tower::initStats() {
             burstDelay    = 0.f;
             burstCooldown = 2.0f;
             maxHp         = 120.f;
-
-                texture.loadFromFile("assets/OASIS-GRAPHICS/VINE_BURST.png");
-                sprite.setTexture(texture);
-                sprite.setOrigin(
-                    texture.getSize().x / 2.f,
-                    texture.getSize().y / 2.f
-                );
-                sprite.setPosition(position);
-                sprite.setScale(0.42f, 0.42f);
-
-            // treeTowerTexture.loadFromFile("assets/OASIS-GRAPHICS/VINE_BURST.png");
-            // treeTowerSprite.setTexture(treeTowerTexture);
-            // treeTowerSprite.setOrigin(
-            //     treeTowerTexture.getSize().x / 2.f,
-            //     treeTowerTexture.getSize().y / 2.f
-            // );
-            // treeTowerSprite.setPosition(position);
-            // treeTowerSprite.setScale(1.f, 1.f);            // 150x160
+            sf::Texture& t = SpriteManager::get().getTexture("tree_tower");
+            sprite.setTexture(t, true);
+            sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
+            sprite.setPosition(position);
+            sprite.setScale(0.15f, 0.15f);
             break;
-
-        case TowerType::WaterMine:
-            texture.loadFromFile("assets/OASIS-GRAPHICS/WATER_WELL.png");
-            sprite.setTexture(texture);
-            sprite.setOrigin(
-                texture.getSize().x / 2.f,
-                texture.getSize().y / 2.f
-            );
+        }
+        case TowerType::WaterMine: {
+            sf::Texture& t = SpriteManager::get().getTexture("water_well");
+            sprite.setTexture(t, true);
+            sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
             sprite.setPosition(position);
             sprite.setScale(0.35f, 0.35f);
-
-        // waterMineTexture.loadFromFile("assets/OASIS-GRAPHICS/WATER_WELL.png");
-        // waterMineSprite.setTexture(waterMineTexture);
-        // waterMineSprite.setOrigin(
-        //     waterMineTexture.getSize().x / 2.f,
-        //     waterMineTexture.getSize().y / 2.f
-        // );
-        // waterMineSprite.setPosition(position);
-        // waterMineSprite.setScale(0.35f, 0.35f);         // 170x200
             break;
+        }
     }
 
     hp = maxHp;
@@ -218,28 +159,10 @@ void Tower::drawHpBar(sf::RenderWindow& window) {
 }
 
 void Tower::draw(sf::RenderWindow& window) {
-    
     if (isDestroyed()) return;
     if (showRange) window.draw(rangeCircle);
     window.draw(sprite);
     drawHpBar(window);
-
-    // switch (type)
-    //     {
-    //         case TowerType::WaterTower:
-    //             window.draw(waterTowerSprite);
-    //             break;
-    //         case TowerType::SunBeam:
-    //             window.draw(sunBeamSprite);
-    //             break;
-    //         case TowerType::TreeTower:
-    //             window.draw(treeTowerSprite);
-    //             break;
-    //         case TowerType::WaterMine:
-    //             window.draw(waterMineSprite);
-    //             break;
-    //     }
-
 }
 
 void Tower::setShowRange(bool show) { showRange = show; }
@@ -247,12 +170,22 @@ void Tower::setShowRange(bool show) { showRange = show; }
 sf::Vector2f Tower::getPosition() const { return position; }
 TowerType    Tower::getType()     const { return type; }
 
+// int Tower::getCost(TowerType type) {
+//     switch (type) {
+//         case TowerType::WaterTower: return 60;
+//         case TowerType::SunBeam:    return 150;
+//         case TowerType::TreeTower:  return 75;
+//         case TowerType::WaterMine:  return 60;
+//         default:                    return 0;
+//     }
+// }
+
 int Tower::getCost(TowerType type) {
     switch (type) {
-        case TowerType::WaterTower: return 60;
-        case TowerType::SunBeam:    return 150;
-        case TowerType::TreeTower:  return 75;
-        case TowerType::WaterMine:  return 60;
+        case TowerType::WaterTower: return 0;
+        case TowerType::SunBeam:    return 0;
+        case TowerType::TreeTower:  return 0;
+        case TowerType::WaterMine:  return 0;
         default:                    return 0;
     }
 }

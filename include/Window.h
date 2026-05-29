@@ -40,7 +40,7 @@ public:
     void setHUDView();
 
     // Scaling and Align Background Sprites for Window
-    void scaleAndCenterSprite(sf::Sprite& sprite) const;
+    void scaleAndCenterSprite(sf::Sprite& sprite, float zoom = 1.f) const;
 
     // Map a raw pixel to world or HUD (virtual 1280x720) coordinates
     sf::Vector2f mapPixelToCoords(sf::Vector2i pixel) const; // → world view

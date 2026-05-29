@@ -17,7 +17,7 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     currencyText.setFillColor(sf::Color(39, 12, 32));
     currencyTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/1.png");
     currencySprite.setTexture(currencyTexture);
-    currencySprite.setScale(1.7f, 2.2f);
+    currencySprite.setScale(0.15f, 0.15f);
 
     // Small wave label - top middle
     waveText.setFont(font);
@@ -222,12 +222,11 @@ void HUD::drawCurrency(sf::RenderWindow& window) {
     ss << waterPoints;
     currencyText.setString(ss.str());
 
+    currencySprite.setPosition(1118.f, 15.f);
+    window.draw(currencySprite);
+
     float textWidth = currencyText.getLocalBounds().width;
     currencyText.setPosition(windowWidth - textWidth - 36.f, 67.f);
-    sf::FloatRect spriteBounds = currencySprite.getGlobalBounds();
-
-    currencySprite.setPosition(windowWidth - spriteBounds.width + 22.f, -18.f);
-    window.draw(currencySprite);
     window.draw(currencyText);
 }
 

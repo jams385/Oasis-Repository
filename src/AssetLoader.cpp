@@ -60,6 +60,16 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("soldier_running_5", SOLDIER_RUNNING + "6.png");
     SpriteManager::get().loadTexture("soldier_running_6", SOLDIER_RUNNING + "7.png");
     SpriteManager::get().loadTexture("soldier_running_7", SOLDIER_RUNNING + "8.png");
+
+    // ── Towers ───────────────────────────────────────────────────────────────────
+    SpriteManager::get().loadTexture("water_tower",     "assets/OASIS-GRAPHICS/WATER_TOWER_2.png");
+    SpriteManager::get().loadTexture("sunbeam_tower",   "assets/OASIS-GRAPHICS/SUN_BEAM_TOWER_2.png");
+    SpriteManager::get().loadTexture("tree_tower",      "assets/OASIS-GRAPHICS/VINE_BURST.png");
+    SpriteManager::get().loadTexture("water_well",      "assets/OASIS-GRAPHICS/WATER_WELL.png");
+
+    // ── Cornucopia ───────────────────────────────────────────────────────────────
+    SpriteManager::get().loadTexture("cornucopia_main", "assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png");
+    SpriteManager::get().loadTexture("cornucopia_mini", "assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
 }
 
 void AssetLoader::loadSounds() {
