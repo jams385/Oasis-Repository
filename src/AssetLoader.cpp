@@ -64,7 +64,7 @@ void AssetLoader::loadSprites() {
     // ── Towers ───────────────────────────────────────────────────────────────────
     SpriteManager::get().loadTexture("water_tower",     "assets/OASIS-GRAPHICS/WATER_TOWER_2.png");
     SpriteManager::get().loadTexture("sunbeam_tower",   "assets/OASIS-GRAPHICS/SUN_BEAM_TOWER_2.png");
-    SpriteManager::get().loadTexture("tree_tower",      "assets/OASIS-GRAPHICS/VINE_BURST.png");
+    SpriteManager::get().loadTexture("tree_tower",      "assets/OASIS-GRAPHICS/TREE_TOWER.png");
     SpriteManager::get().loadTexture("water_well",      "assets/OASIS-GRAPHICS/WATER_WELL.png");
 
     // ── Cornucopia ───────────────────────────────────────────────────────────────
