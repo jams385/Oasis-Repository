@@ -25,7 +25,7 @@ void Enemy::initStats() {
     switch (type) {
 
         case EnemyType::DustMummy:
-            hp          = 60.f;
+            hp          = 30.f;   //CHANGED FROM 60 TO 30 FOR TEST RUN
             speed       = 60.f;
             damage      = 15.f;
             attackSpeed = 0.8f;
@@ -38,7 +38,7 @@ void Enemy::initStats() {
                 sf::Vector2u sz = t.getSize();
                 animSprite.sprite.setTexture(t, true);
                 animSprite.sprite.setOrigin(sz.x / 2.f, sz.y / 2.f);
-                animSprite.sprite.setScale(0.015f, 0.015f);
+                animSprite.sprite.setScale(1.f, 1.f);
             }
             break;
 
@@ -52,12 +52,23 @@ void Enemy::initStats() {
             speed       = 60.f;
             attackSpeed = 1.2f;      
             reward      = rewardArr[splitGeneration];
+
             shape.setRadius(radArr[splitGeneration]);
-            shape.setFillColor(sf::Color(180, 130, 200));
-            shape.setOutlineColor(sf::Color(120, 60, 160));
-            shape.setOutlineThickness(2.f);
-            break;
-        }
+            animSprite.frames = {"spore_puff_0","spore_puff_1","spore_puff_2","spore_puff_3","spore_puff_4","spore_puff_5"};
+            animSprite.fps = 5.f;
+
+            {
+                sf::Texture& t = SpriteManager::get().getTexture("spore_puff_0");
+                sf::Vector2u sz = t.getSize();
+                animSprite.sprite.setTexture(t, true);
+                animSprite.sprite.setOrigin(sz.x / 2.f, sz.y / 2.f);
+                float scale = 1.f;
+                if (splitGeneration == 1) scale = 0.7f;
+                if (splitGeneration == 2) scale = 0.45f;
+                animSprite.sprite.setScale(scale, scale);
+            }
+    break;
+}
 
         case EnemyType::ShadowCrow:
             hp          = 25.f;         
@@ -65,10 +76,17 @@ void Enemy::initStats() {
             damage      = 5.f;
             attackSpeed = 2.0f;         
             reward      = 20;          
-            shape.setRadius(6.f);
-            shape.setFillColor(sf::Color(50, 50, 80));
-            shape.setOutlineColor(sf::Color(100, 100, 180));
-            shape.setOutlineThickness(1.5f);
+                shape.setRadius(6.f);
+
+            animSprite.frames = {"shadow_crow_0","shadow_crow_1","shadow_crow_2","shadow_crow_3"};
+            animSprite.fps = 8.f;
+            {
+                sf::Texture& t = SpriteManager::get().getTexture("shadow_crow_0");
+                sf::Vector2u sz = t.getSize();
+                animSprite.sprite.setTexture(t, true);
+                animSprite.sprite.setOrigin(sz.x / 2.f, sz.y / 2.f);
+                animSprite.sprite.setScale(1.5f, 1.5f);
+            }
             break;
 
         case EnemyType::RustGolem:
@@ -78,15 +96,20 @@ void Enemy::initStats() {
             attackSpeed = 0.3f;        
             reward      = 50; 
             
-            
-            
             shape.setRadius(15.f);
-            shape.setFillColor(sf::Color(130, 100, 80));
-            shape.setOutlineColor(sf::Color(80, 60, 40));
-            shape.setOutlineThickness(3.f);
-            break;
-    }
 
+            animSprite.frames = {"rust_golem_0","rust_golem_1","rust_golem_2","rust_golem_3","rust_golem_4","rust_golem_5"};
+            animSprite.fps = 5.f;
+            {
+                sf::Texture& t = SpriteManager::get().getTexture("rust_golem_0");
+                sf::Vector2u sz = t.getSize();
+                animSprite.sprite.setTexture(t, true);
+                animSprite.sprite.setOrigin(sz.x / 2.f, sz.y / 2.f);
+                animSprite.sprite.setScale(1.5f, 1.5f);
+            }
+            break;
+
+    }
     maxHp = hp;
 }
 
@@ -131,6 +154,12 @@ void Enemy::update(float dt, sf::Vector2f target, const Map& map) {
             shape.setPosition(position);
         }
     }
+
+    //for facing relative to origin
+    float absX = std::abs(animSprite.sprite.getScale().x);
+    float y    = animSprite.sprite.getScale().y;
+    if (target.x < position.x)animSprite.sprite.setScale(absX, y);
+    else animSprite.sprite.setScale(-absX, y);
 }
 
 

@@ -15,16 +15,34 @@ Cornucopia::Cornucopia(sf::Vector2f worldPos)
     , cornState(CornucopiaState::Broken)
     , popupOpen(false)
 {
-    body.setSize({ BODY_W, BODY_H });
-    body.setOrigin(BODY_W / 2.f, BODY_H / 2.f);
-    body.setPosition(position);
 
-    top.setPointCount(3);
-    top.setPoint(0, { 0.f,            -10.f });
-    top.setPoint(1, { -BODY_W / 2.f,   0.f  });
-    top.setPoint(2, {  BODY_W / 2.f,   0.f  });
-    top.setOutlineThickness(1.5f);
-    top.setPosition(position.x, position.y - BODY_H / 2.f);
+    cornucopiaMainTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png");
+    cornucopiaMiniTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
+    cornucopiaMainSprite.setTexture(cornucopiaMainTexture);
+    cornucopiaMiniSprite.setTexture(cornucopiaMiniTexture);
+    
+        // // MAIN CORNUCOPIA
+        // cornucopiaMainTexture.loadFromFile(
+        //     "assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png"
+        // );
+        // cornucopiaMainSprite.setTexture(cornucopiaMainTexture);
+        // cornucopiaMainSprite.setOrigin(
+        //     cornucopiaMainTexture.getSize().x / 2.f,
+        //     cornucopiaMainTexture.getSize().y / 2.f
+        // );
+        // cornucopiaMainSprite.setPosition(position);
+        // cornucopiaMainSprite.setScale(0.7f, 0.7f);
+
+        // // MINI CORNUCOPIA
+        // cornucopiaMiniTexture.loadFromFile(
+        //     "assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
+        // cornucopiaMiniSprite.setTexture(cornucopiaMiniTexture);
+        // cornucopiaMiniSprite.setOrigin(
+        //     cornucopiaMiniTexture.getSize().x / 2.f,
+        //     cornucopiaMiniTexture.getSize().y / 2.f);
+        // cornucopiaMiniSprite.setPosition(position);
+        // cornucopiaMiniSprite.setScale(0.6f, 0.6f);
+
 
     float popupX = position.x - POPUP_W / 2.f;
     float popupY = position.y - BODY_H / 2.f - 10.f - 6.f - POPUP_H;
@@ -37,20 +55,26 @@ Cornucopia::Cornucopia(sf::Vector2f worldPos)
     applyVisual();
 }
 
-void Cornucopia::applyVisual() {
-    if (cornState == CornucopiaState::Broken) {
-        body.setFillColor(sf::Color(70, 65, 50));
-        body.setOutlineColor(sf::Color(90, 90, 90));
-        body.setOutlineThickness(2.f);
-        top.setFillColor(sf::Color(100, 95, 70));
-        top.setOutlineColor(sf::Color(90, 90, 90));
-    } else {
-        body.setFillColor(sf::Color(180, 130, 20));
-        body.setOutlineColor(sf::Color(255, 215, 0));
-        body.setOutlineThickness(2.5f);
-        top.setFillColor(sf::Color(255, 215, 0));
-        top.setOutlineColor(sf::Color(200, 160, 0));
-    }
+// void Cornucopia::applyVisual()
+// {
+//     if (cornState == CornucopiaState::Broken)
+//     {
+//         cornucopiaMiniTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
+//         cornucopiaMainSprite.setScale(0.6f, 0.6f);
+//     }
+//     else
+//     {
+//         cornucopiaMiniTexture.loadFromFile("assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png");
+//         cornucopiaMainSprite.setScale(0.7f, 0.7f);
+//     }
+//     cornucopiaMainSprite.setTexture(cornucopiaMiniTexture);
+// }
+
+void Cornucopia::applyVisual()
+{
+    if (cornState == CornucopiaState::Broken)
+    {cornucopiaMiniSprite.setColor(sf::Color(150, 150, 150));} // grey tint
+
 }
 
 void Cornucopia::restore() {
@@ -70,8 +94,16 @@ sf::FloatRect Cornucopia::getPopupBounds() const {
     return popupBox.getGlobalBounds();
 }
 
-bool Cornucopia::containsPoint(sf::Vector2f p) const {
-    return body.getGlobalBounds().contains(p) || top.getGlobalBounds().contains(p);
+// bool Cornucopia::containsPoint(sf::Vector2f p) const {
+//     return body.getGlobalBounds().contains(p) || top.getGlobalBounds().contains(p);
+// }
+
+bool Cornucopia::containsPoint(sf::Vector2f p) const
+{
+    if (cornState == CornucopiaState::Broken)
+        return cornucopiaMiniSprite.getGlobalBounds().contains(p);
+
+    return cornucopiaMainSprite.getGlobalBounds().contains(p);
 }
 
 void Cornucopia::update(float dt) {
@@ -84,19 +116,38 @@ void Cornucopia::update(float dt) {
     }
 }
 
-void Cornucopia::draw(sf::RenderWindow& window) {
-    window.draw(top);
-    window.draw(body);
+void Cornucopia::draw(sf::RenderWindow& window)
+{
+    if (cornState == CornucopiaState::Broken)
+        window.draw(cornucopiaMiniSprite);
+    else
+        window.draw(cornucopiaMainSprite);
     if (cornState == CornucopiaState::Active)
         drawHpBar(window);
     if (popupOpen)
         window.draw(popupBox);
 }
 
-void Cornucopia::drawHpBar(sf::RenderWindow& window) {
-    float barW = BODY_W + 9.f;
-    drawHealthBar(window, position.x - barW / 2.f, position.y - BODY_H / 2.f - 16.f,
-                  barW, 5.f, hp / maxHp, sf::Color(255, 165, 0));
+
+// void Cornucopia::drawHpBar(sf::RenderWindow& window) {
+//     float barW = BODY_W + 9.f;
+//     drawHealthBar(window, position.x - barW / 2.f, position.y - BODY_H / 2.f - 16.f,
+//                   barW, 5.f, hp / maxHp, sf::Color(255, 165, 0));
+// }
+
+void Cornucopia::drawHpBar(sf::RenderWindow& window)
+{
+    sf::FloatRect bounds =
+        cornucopiaMainSprite.getGlobalBounds();
+    drawHealthBar(
+        window,
+        position.x - bounds.width / 2.f,
+        position.y - bounds.height / 2.f - 10.f,
+        bounds.width,
+        5.f,
+        hp / maxHp,
+        sf::Color(255, 165, 0)
+    );
 }
 
 void Cornucopia::takeDamage(float amount) {
