@@ -30,6 +30,8 @@ private:
     // ── Currency ──────────────────────────────────────────────────────────────
     int          waterPoints = 0;
     sf::Text     currencyText;
+    sf::Texture currencyTexture;
+    sf::Sprite  currencySprite;
 
     // ── Cornucopia count ──────────────────────────────────────────────────────
     int          restoredCount    = 0;
