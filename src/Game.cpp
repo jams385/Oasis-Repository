@@ -613,6 +613,7 @@ void Game::reset() {
     waterPoints     = 150;
     waveNumber      = 0;
     wasNight        = false;
+    darknessAlpha   = 0.f;
     selectedCornIdx = -1;
 
     map = Map();
