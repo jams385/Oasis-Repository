@@ -1,6 +1,5 @@
 #include "HUD.h"
 #include <sstream>
-#include <iostream>
 
 // ── Button layout constants ───────────────────────────────────────────────────
 const float BTN_WIDTH   = 110.f;
@@ -15,7 +14,12 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     // Currency text - top right
     currencyText.setFont(font);
     currencyText.setCharacterSize(22);
-    currencyText.setFillColor(sf::Color::Cyan);
+    currencyText.setFillColor(sf::Color(39, 12, 32));
+    currencyTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/1.png");
+    currencySprite.setTexture(currencyTexture);
+    currencySprite.setScale(1.7f, 2.2f); 
+    
+    
 
     // Small wave label - top middle
     waveText.setFont(font);
@@ -184,6 +188,7 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
 }
 
 void HUD::deselect() {
+    float targetSize = 135.f;
     for (auto& b : buttons) {
         b.selected = false;
         b.shape.setOutlineColor(sf::Color::Transparent);
@@ -213,11 +218,15 @@ void HUD::drawDayNightBar(sf::RenderWindow& window) {
 
 void HUD::drawCurrency(sf::RenderWindow& window) {
     std::ostringstream ss;
-    ss << "Water: " << waterPoints;
+    ss << waterPoints;
     currencyText.setString(ss.str());
 
     float textWidth = currencyText.getLocalBounds().width;
-    currencyText.setPosition(windowWidth - textWidth - 20.f, 14.f);
+    currencyText.setPosition(windowWidth - textWidth - 36.f, 67.f);
+    sf::FloatRect spriteBounds = currencySprite.getGlobalBounds();
+
+    currencySprite.setPosition(windowWidth - spriteBounds.width + 22.f, -18.f);
+    window.draw(currencySprite);
     window.draw(currencyText);
 }
 

@@ -569,7 +569,7 @@ void Game::render(Window& window) {
         darkness.setPosition(currentView.getCenter() - currentView.getSize() / 2.f);
 
         darkness.setFillColor(
-        sf::Color(43, 16, 26, (sf::Uint8)darknessAlpha)
+        sf::Color(39, 12, 32, (sf::Uint8)darknessAlpha)
         );
 
 window.draw(darkness);
