@@ -311,7 +311,7 @@ void Game::update(float dt) {
 
     bool nowNight = hud.isNight();
     //fade
-    float targetAlpha = hud.isNight() ? 120.f : 0.f;
+    float targetAlpha = hud.isNight() ? 75.f : 0.f;
     darknessAlpha += (targetAlpha - darknessAlpha) * 1.f * dt;
 
     if (nowNight != wasNight) {
@@ -491,7 +491,7 @@ void Game::render(Window& window) {
         darkness.setPosition(currentView.getCenter() - currentView.getSize() / 2.f);
 
         darkness.setFillColor(
-        sf::Color(15, 10, 40, (sf::Uint8)darknessAlpha)
+        sf::Color(43, 16, 26, (sf::Uint8)darknessAlpha)
         );
 
 window.draw(darkness);
