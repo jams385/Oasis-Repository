@@ -76,7 +76,10 @@ void Enemy::initStats() {
             speed       = 35.f;         
             damage      = 40.f;        
             attackSpeed = 0.3f;        
-            reward      = 50;          
+            reward      = 50; 
+            
+            
+            
             shape.setRadius(15.f);
             shape.setFillColor(sf::Color(130, 100, 80));
             shape.setOutlineColor(sf::Color(80, 60, 40));

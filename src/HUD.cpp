@@ -1,6 +1,5 @@
 #include "HUD.h"
 #include <sstream>
-#include <iostream>
 
 // ── Button layout constants ───────────────────────────────────────────────────
 const float BTN_WIDTH   = 110.f;
@@ -15,7 +14,12 @@ HUD::HUD(sf::Font& font, int windowWidth, int windowHeight)
     // Currency text - top right
     currencyText.setFont(font);
     currencyText.setCharacterSize(22);
-    currencyText.setFillColor(sf::Color::Cyan);
+    currencyText.setFillColor(sf::Color(39, 12, 32));
+    currencyTexture.loadFromFile("assets/OASIS-GRAPHICS/2-INGAME_HUD_GRAPHICS/1.png");
+    currencySprite.setTexture(currencyTexture);
+    currencySprite.setScale(1.7f, 2.2f); 
+    
+    
 
     // Small wave label - top middle
     waveText.setFont(font);
@@ -118,31 +122,25 @@ void HUD::buildButtons() {
             break;
     }
 
-    sf::FloatRect bounds = btn.iconSprite.getLocalBounds();
+sf::FloatRect bounds = btn.iconSprite.getLocalBounds();
 
-    float targetSize = 135.f;
+float targetSize = 135.f;
 
-    btn.iconSprite.setScale(
-        targetSize / bounds.width,
-        targetSize / bounds.height
-    );
+btn.iconSprite.setScale(
+    targetSize / bounds.width,
+    targetSize / bounds.height
+);
 
-    btn.iconSprite.setPosition(
-        x + (BTN_WIDTH - targetSize) / 2.f,
-        y + -25.f
-    );
+btn.iconSprite.setPosition(
+    x + (BTN_WIDTH - targetSize) / 2.f,
+    y + -25.f
+);
 
     btn.nameText.setFont(font);
     btn.nameText.setString(defs[i].name);
     btn.nameText.setCharacterSize(14);
     btn.nameText.setFillColor(sf::Color::White);
-    //btn.nameText.setPosition(x + 8.f, y + 6.f);
 
-    // btn.costText.setFont(font);
-    // btn.costText.setString("$" + std::to_string(cost));
-    // btn.costText.setCharacterSize(13);
-    // btn.costText.setFillColor(sf::Color(200, 230, 255));
-    // btn.costText.setPosition(x + 8.f, y + BTN_HEIGHT - 22.f);
     btn.selected = false;
     buttons.push_back(btn);
 }}
@@ -218,9 +216,15 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
                 btn.shape.setOutlineColor(sf::Color::White);
                 btn.shape.setOutlineThickness(4.f);
 
-                sf::FloatRect spriteBounds = btn.iconSprite.getGlobalBounds();
-                btn.shape.setSize({ spriteBounds.width, spriteBounds.height });
-                btn.shape.setPosition(btn.iconSprite.getPosition());
+                float outlineWidth  = 92.f;
+                float outlineHeight = 100.f;
+
+                btn.shape.setSize({ outlineWidth, outlineHeight });
+
+                btn.shape.setPosition(
+                    btn.iconSprite.getPosition().x + (135.f - outlineWidth) / 2.f,
+                    btn.iconSprite.getPosition().y + (135.f - outlineHeight) / 2.f
+                );
 
                 selectedTower = btn.type;
                 _hasSelection = true;
@@ -233,11 +237,12 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
 }
 
 void HUD::deselect() {
+    float targetSize = 135.f;
     for (auto& b : buttons) {
         b.selected = false;
         b.shape.setOutlineColor(sf::Color::Transparent);
         b.shape.setOutlineThickness(0.f);
-        b.shape.setSize({ BTN_WIDTH, BTN_HEIGHT });
+        b.shape.setSize({ targetSize, targetSize });
 
         if (b.shape.getSize().y == BTN_HEIGHT) { 
             b.shape.setPosition(b.shape.getPosition().x, b.shape.getPosition().y + 25.f);
@@ -267,11 +272,15 @@ void HUD::drawDayNightBar(sf::RenderWindow& window) {
 
 void HUD::drawCurrency(sf::RenderWindow& window) {
     std::ostringstream ss;
-    ss << "Water: " << waterPoints;
+    ss << waterPoints;
     currencyText.setString(ss.str());
 
     float textWidth = currencyText.getLocalBounds().width;
-    currencyText.setPosition(windowWidth - textWidth - 20.f, 14.f);
+    currencyText.setPosition(windowWidth - textWidth - 36.f, 67.f);
+    sf::FloatRect spriteBounds = currencySprite.getGlobalBounds();
+
+    currencySprite.setPosition(windowWidth - spriteBounds.width + 22.f, -18.f);
+    window.draw(currencySprite);
     window.draw(currencyText);
 }
 
@@ -310,8 +319,6 @@ void HUD::drawStructureButtons(sf::RenderWindow& window) {
 
         window.draw(btn.shape);
         window.draw(btn.iconSprite);
-        window.draw(btn.nameText);
-        window.draw(btn.costText);
 
         if (btn.type == TowerType::WaterMine) {
             sf::Vector2f pos  = btn.shape.getPosition();
