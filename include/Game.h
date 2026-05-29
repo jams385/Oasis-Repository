@@ -12,8 +12,9 @@
 #include "HUD.h"
 #include "WaterMine.h"
 #include "Cutscene.h"
+#include "Stats.h"
 
-enum class GameState { Menu, Cutscene, Playing, Paused, Won, Lost };
+enum class GameState { Menu, Cutscene, Playing, Paused, Won, Lost, StatsMenu };
 
 class Game {
 public:
@@ -48,6 +49,7 @@ private:
     std::vector<Bullet>     bullets;
     std::vector<WaterMine>  waterMines;
 
+    Stats        stats;
     int          waterPoints;
     int          waveNumber;
     sf::Vector2i hoveredTile;

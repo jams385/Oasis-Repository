@@ -30,6 +30,7 @@ add_executable(Oasis
     src/Cutscene.cpp
     src/AssetLoader.cpp
     src/Pathfinder.cpp
+    src/Stats.cpp
 )
 
 target_include_directories(Oasis PRIVATE include)

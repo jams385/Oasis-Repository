@@ -40,6 +40,7 @@ Game::Game(int width, int height)
     );
 
     AssetLoader::loadAll();
+    stats.load("assets/stats.txt");
 
     placeCornucopias();
 }
@@ -55,15 +56,24 @@ void Game::processEvent(const sf::Event& event, Window& window) {
     }
 
     if (state == GameState::Menu) {
-        if (event.type == sf::Event::KeyPressed &&
-            event.key.code == sf::Keyboard::Enter) {
-
-            AudioManager::get().play("flute_start");
-            AudioManager::get().playMusic("assets/audio/OasisCutscene.ogg", false);
-            cutscene.reset();
-            state = GameState::Cutscene;
-
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Enter) {
+                AudioManager::get().play("flute_start");
+                AudioManager::get().playMusic("assets/audio/OasisCutscene.ogg", false);
+                cutscene.reset();
+                state = GameState::Cutscene;
+            } else if (event.key.code == sf::Keyboard::S) {
+                state = GameState::StatsMenu;
+            }
         }
+        return;
+    }
+
+    if (state == GameState::StatsMenu) {
+        if (event.type == sf::Event::KeyPressed &&
+            (event.key.code == sf::Keyboard::Escape ||
+             event.key.code == sf::Keyboard::Enter))
+            state = GameState::Menu;
         return;
     }
 
@@ -190,6 +200,8 @@ void Game::processEvent(const sf::Event& event, Window& window) {
                         if (waterPoints >= cost) {
                             waterPoints -= cost;
                             c.restore();
+                            stats.oasesRestored++;
+                            stats.save("assets/stats.txt");
                         }
                     } else {
                         c.closePopup();
@@ -294,16 +306,22 @@ void Game::update(float dt) {
         if (c.isActive()) activeCount++;
 
     if (activeCount == total) {
+        stats.wins++;
+        stats.highestWave = std::max(stats.highestWave, waveNumber);
+        stats.save("assets/stats.txt");
         state = GameState::Won;
         AudioManager::get().stopMusic();
         AudioManager::get().play("win_sound", 100.f);
         return;
     }
-    if (activeCount == 0){ 
-        state = GameState::Lost; 
+    if (activeCount == 0){
+        stats.losses++;
+        stats.highestWave = std::max(stats.highestWave, waveNumber);
+        stats.save("assets/stats.txt");
+        state = GameState::Lost;
         AudioManager::get().stopMusic();
         AudioManager::get().play("lose_sound", 100.f);
-        return; 
+        return;
     }
 
     AudioManager::get().update();
@@ -395,6 +413,7 @@ void Game::update(float dt) {
                 toSpawn.emplace_back(EnemyType::SporePuff, p + sf::Vector2f( 12.f, 0.f), ng);
             } else {
                 waterPoints += e.getReward();
+                stats.enemiesKilled++;
             }
         }
     }
@@ -420,7 +439,66 @@ void Game::render(Window& window) {
         window.setHUDView();
         float centerX = windowWidth / 2.f;
         drawText(window, font, "Press ENTER to start", centerX, 400.f, 28, sf::Color(180,180,180), true);
-        drawText(window, font, "Version 0.1",          centerX, 500.f, 18, sf::Color(100,100,100), true);
+        drawText(window, font, "S - Statistics",       centerX, 450.f, 20, sf::Color(130,180,130), true);
+        drawText(window, font, "Version 0.1",          centerX, 530.f, 18, sf::Color(100,100,100), true);
+    }
+    else if (state == GameState::StatsMenu) {
+        window.draw(menuBgSprite);
+        window.setHUDView();
+
+        // Dark panel
+        float pw = 480.f, ph = 360.f;
+        float px = (windowWidth  - pw) / 2.f;
+        float py = (windowHeight - ph) / 2.f;
+        sf::RectangleShape panel({ pw, ph });
+        panel.setPosition(px, py);
+        panel.setFillColor(sf::Color(8, 12, 28, 230));
+        panel.setOutlineColor(sf::Color(255, 215, 0, 200));
+        panel.setOutlineThickness(2.f);
+        window.draw(panel);
+
+        // Divider under title
+        float divY = py + 54.f;
+        sf::RectangleShape divider({ pw - 40.f, 1.f });
+        divider.setPosition(px + 20.f, divY);
+        divider.setFillColor(sf::Color(255, 215, 0, 120));
+        window.draw(divider);
+
+        float cx   = windowWidth / 2.f;
+        float rowX = px + 60.f;
+        float valX = px + pw - 60.f;
+        float rowY = divY + 24.f;
+        float rowH = 46.f;
+
+        sf::Color gold (255, 215,   0);
+        sf::Color label(200, 200, 200);
+        sf::Color value(180, 230, 255);
+        sf::Color dim  (120, 120, 120);
+
+        drawText(window, font, "STATISTICS", cx, py + 16.f, 30, gold, true);
+
+        // Row helper: label left, value right
+        struct Row { const char* lbl; int val; };
+        Row rows[] = {
+            { "Wins",           stats.wins          },
+            { "Losses",         stats.losses        },
+            { "Enemies Killed", stats.enemiesKilled },
+            { "Oases Restored", stats.oasesRestored },
+            { "Highest Wave",   stats.highestWave   },
+        };
+        for (auto& r : rows) {
+            drawText(window, font, r.lbl,                    rowX, rowY, 20, label, false);
+            drawText(window, font, std::to_string(r.val),    valX, rowY, 20, value, true);
+            rowY += rowH;
+        }
+
+        // Bottom divider
+        sf::RectangleShape divider2({ pw - 40.f, 1.f });
+        divider2.setPosition(px + 20.f, py + ph - 46.f);
+        divider2.setFillColor(sf::Color(255, 215, 0, 80));
+        window.draw(divider2);
+
+        drawText(window, font, "ESC / ENTER to go back", cx, py + ph - 34.f, 16, dim, true);
     }
     else if (state == GameState::Playing || state == GameState::Paused) {
         window.setWorldView();
