@@ -68,17 +68,10 @@ void Tower::initStats() {
             sprite.setTexture(t, true);
             sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
             sprite.setPosition(position);
-            sprite.setScale(0.15f, 0.15f);
+            sprite.setScale(0.3f, 0.3f);
             break;
         }
-        case TowerType::WaterMine: {
-            sf::Texture& t = SpriteManager::get().getTexture("water_well");
-            sprite.setTexture(t, true);
-            sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
-            sprite.setPosition(position);
-            sprite.setScale(0.35f, 0.35f);
-            break;
-        }
+        default: break;
     }
 
     hp = maxHp;
@@ -170,22 +163,12 @@ void Tower::setShowRange(bool show) { showRange = show; }
 sf::Vector2f Tower::getPosition() const { return position; }
 TowerType    Tower::getType()     const { return type; }
 
-// int Tower::getCost(TowerType type) {
-//     switch (type) {
-//         case TowerType::WaterTower: return 60;
-//         case TowerType::SunBeam:    return 150;
-//         case TowerType::TreeTower:  return 75;
-//         case TowerType::WaterMine:  return 60;
-//         default:                    return 0;
-//     }
-// }
-
 int Tower::getCost(TowerType type) {
     switch (type) {
-        case TowerType::WaterTower: return 0;
-        case TowerType::SunBeam:    return 0;
-        case TowerType::TreeTower:  return 0;
-        case TowerType::WaterMine:  return 0;
+        case TowerType::WaterTower: return 60;
+        case TowerType::SunBeam:    return 150;
+        case TowerType::TreeTower:  return 75;
+        case TowerType::WaterMine:  return 60;
         default:                    return 0;
     }
 }

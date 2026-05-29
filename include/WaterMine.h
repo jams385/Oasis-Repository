@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "SpriteManager.h"
 
 class WaterMine {
 public:
@@ -30,7 +31,7 @@ private:
     float           popupY          = 0.f;
     int             popupAmount     = 0;
 
-    sf::CircleShape shape;
+    sf::Sprite      sprite;
     sf::CircleShape popCircle;
     sf::Text        popText;
     sf::Text        collectText;

@@ -7,9 +7,10 @@ void AssetLoader::loadAll() {
     loadSounds();
 }
 
+
 void AssetLoader::loadSprites() {
     
-    // ── Dust Mummy  ──────────────────────────────────────────────────────────────────────
+
     static const std::string MUMMY = "assets/OASIS-GRAPHICS/2-BLOOD_GOBLIN_SPRITE/";
     SpriteManager::get().loadTexture("dust_mummy_0", MUMMY + "1.png");
     SpriteManager::get().loadTexture("dust_mummy_1", MUMMY + "2.png");
@@ -18,7 +19,7 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("dust_mummy_4", MUMMY + "5.png");
     SpriteManager::get().loadTexture("dust_mummy_5", MUMMY + "6.png");
 
-    // ── Rust Golem ───────────────────────────────────────────────────────────────
+  
     static const std::string RUST_GOLEM = "assets/OASIS-GRAPHICS/2-RUST_GOLEM_SPRITE/";
     SpriteManager::get().loadTexture("rust_golem_0", RUST_GOLEM + "1.png");
     SpriteManager::get().loadTexture("rust_golem_1", RUST_GOLEM + "2.png");
@@ -27,14 +28,14 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("rust_golem_4", RUST_GOLEM + "5.png");
     SpriteManager::get().loadTexture("rust_golem_5", RUST_GOLEM + "6.png");
 
-    // ── Shadow Crow ──────────────────────────────────────────────────────────────
+
     static const std::string SHADOW_CROW = "assets/OASIS-GRAPHICS/2-SHADOW_CROW_SPRITE/";
     SpriteManager::get().loadTexture("shadow_crow_0", SHADOW_CROW + "1.png");
     SpriteManager::get().loadTexture("shadow_crow_1", SHADOW_CROW + "2.png");
     SpriteManager::get().loadTexture("shadow_crow_2", SHADOW_CROW + "3.png");
     SpriteManager::get().loadTexture("shadow_crow_3", SHADOW_CROW + "4.png");
 
-    // ── Spore Puff ───────────────────────────────────────────────────────────────
+
     static const std::string SPORE_PUFF = "assets/OASIS-GRAPHICS/2-SPORE-PUFF-SPRITE/";
     SpriteManager::get().loadTexture("spore_puff_0", SPORE_PUFF + "1.png");
     SpriteManager::get().loadTexture("spore_puff_1", SPORE_PUFF + "2.png");

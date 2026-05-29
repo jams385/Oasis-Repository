@@ -8,19 +8,20 @@ WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     : position(worldPos)
     , font(&font)
 {
-    shape.setRadius(10.f);
-    shape.setOrigin(10.f, 10.f);
-    shape.setFillColor(sf::Color(0, 160, 160));
-    shape.setOutlineColor(sf::Color(0, 220, 220));
-    shape.setOutlineThickness(2.f);
-    shape.setPosition(position);
+    sf::Texture& t = SpriteManager::get().getTexture("water_well");
+    sprite.setTexture(t, true);
+    sprite.setOrigin(t.getSize().x / 2.f, t.getSize().y / 2.f);
+    sprite.setPosition(position);
+    sprite.setScale(0.35f, 0.35f);
+
+    float popY = position.y - sprite.getGlobalBounds().height / 2.f - 10.f;
 
     popCircle.setRadius(8.f);
     popCircle.setOrigin(8.f, 8.f);
     popCircle.setFillColor(sf::Color::White);
     popCircle.setOutlineColor(sf::Color(0, 160, 160));
     popCircle.setOutlineThickness(2.f);
-    popCircle.setPosition(position.x, position.y - 22.f);
+    popCircle.setPosition(position.x, popY);
 
     popText.setFont(font);
     popText.setString("!");
@@ -28,7 +29,7 @@ WaterMine::WaterMine(sf::Vector2f worldPos, sf::Font& font)
     popText.setFillColor(sf::Color(0, 100, 100));
     sf::FloatRect tb = popText.getLocalBounds();
     popText.setOrigin(tb.left + tb.width / 2.f, tb.top + tb.height / 2.f);
-    popText.setPosition(position.x, position.y - 22.f);
+    popText.setPosition(position.x, popY);
 
     collectText.setFont(font);
     collectText.setCharacterSize(14);
@@ -65,7 +66,7 @@ void WaterMine::update(float dt) {
 
 void WaterMine::draw(sf::RenderWindow& window) {
     if (isDestroyed()) return;
-    window.draw(shape);
+    window.draw(sprite);
     drawHpBar(window);
     if (ready) {
         window.draw(popCircle);
@@ -85,14 +86,16 @@ void WaterMine::takeDamage(float amount) {
 bool WaterMine::isDestroyed() const { return hp <= 0.f; }
 
 void WaterMine::drawHpBar(sf::RenderWindow& window) {
-    float r = shape.getRadius();
-    drawHealthBar(window, position.x - r, position.y - r - 6.f,
-                  r * 2.f, 4.f, hp / maxHp, sf::Color(255, 100, 50));
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    drawHealthBar(window,
+        position.x - bounds.width / 2.f,
+        position.y - bounds.height / 2.f - 6.f,
+        bounds.width, 4.f, hp / maxHp, sf::Color(255, 100, 50));
 }
 
 bool         WaterMine::isReady()                       const { return ready; }
 sf::Vector2f WaterMine::getPosition()                   const { return position; }
-bool         WaterMine::contains(sf::Vector2f mousePos) const { return shape.getGlobalBounds().contains(mousePos); }
+bool         WaterMine::contains(sf::Vector2f mousePos) const { return sprite.getGlobalBounds().contains(mousePos); }
 
 int WaterMine::collect() {
     ready        = false;
