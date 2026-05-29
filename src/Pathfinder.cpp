@@ -8,12 +8,12 @@ namespace {
 
     struct Node{
         sf::Vector2i pos;
-        float currentDistanceTraveled, totalPathLength;
+        float g, f;
     };
 
     struct NodeCmp{
         bool operator() (const Node& a, const Node& b) const {
-            return a.totalPathLength > b.totalPathLength;
+            return a.f > b.f;
         }
     };
 
@@ -85,8 +85,8 @@ std::vector<sf::Vector2f> Pathfinder::findPath(const Map& map, sf::Vector2f star
         gScore -> encodes starting position (1D array index) -> assign a score of 0.f.
 
         open -> pushes: pos = starting tile,
-                        g = 0.f
-                        totalPathLength = heuristic(start, goal) = full path needed to walk
+                        g = 0.f (distance traveled so far)
+                        f = heuristic(start, goal) = estimated total path length
 
         loop while open has elements -> checks in order of priority -> pop after storing info
         -> if the current position is the same as the goal, push the tiles from goal to start
@@ -120,7 +120,7 @@ std::vector<sf::Vector2f> Pathfinder::findPath(const Map& map, sf::Vector2f star
 
             "if the tile already has a gScore and it's worse then the path we found, skip it"
         */
-        if(gScore.count(curKey) && cur.currentDistanceTraveled > gScore.at(curKey) + 1e-4f){
+        if(gScore.count(curKey) && cur.g > gScore.at(curKey) + 1e-4f){
             continue;
         }
 
@@ -140,7 +140,7 @@ std::vector<sf::Vector2f> Pathfinder::findPath(const Map& map, sf::Vector2f star
 
             if(!walkable) continue;
 
-            float newG = cur.currentDistanceTraveled + COST[i];
+            float newG = cur.g + COST[i];
             int nKey = encode(next);
 
             if(!gScore.count(nKey) || newG < gScore.at(nKey)){

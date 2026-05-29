@@ -572,8 +572,6 @@ void Game::render(Window& window) {
         sf::Color(39, 12, 32, (sf::Uint8)darknessAlpha)
         );
 
-window.draw(darkness);
-
         window.draw(darkness);
         window.setHUDView();
         hud.draw(window);

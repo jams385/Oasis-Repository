@@ -188,7 +188,6 @@ bool HUD::handleClick(sf::Vector2f mousePos) {
 }
 
 void HUD::deselect() {
-    float targetSize = 135.f;
     for (auto& b : buttons) {
         b.selected = false;
         b.shape.setOutlineColor(sf::Color::Transparent);
