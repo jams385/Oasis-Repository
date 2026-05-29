@@ -1,5 +1,5 @@
 wins=0
-losses=2
-enemiesKilled=48
+losses=3
+enemiesKilled=52
 oasesRestored=0
 highestWave=3
