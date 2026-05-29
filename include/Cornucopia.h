@@ -7,7 +7,7 @@ enum class CornucopiaState { Broken, Active };
 class Cornucopia {
 public:
     static constexpr int NUM_CORNUCOPIAS  = 5;
-    static constexpr int RESTORE_COST_BASE = 0;
+    static constexpr int RESTORE_COST_BASE = 500;
 
     static int getRestoreCost(int activeCount) {
         return RESTORE_COST_BASE * activeCount;
@@ -43,8 +43,11 @@ private:
     CornucopiaState    cornState;
     bool               popupOpen;
 
-    sf::RectangleShape body;
-    sf::ConvexShape    top;
+    sf::Texture cornucopiaMiniTexture; sf::Sprite  cornucopiaMiniSprite;
+    sf::Texture cornucopiaMainTexture;  sf::Sprite  cornucopiaMainSprite;
+
+    // sf::RectangleShape body;
+    // sf::ConvexShape    top;
     sf::RectangleShape popupBox;
     Soldier            soldier;
 
