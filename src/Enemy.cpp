@@ -25,11 +25,11 @@ void Enemy::initStats() {
     switch (type) {
 
         case EnemyType::DustMummy:
-            hp          = 30.f;   //CHANGED FROM 60 TO 30 FOR TEST RUN
-            speed       = 60.f;
-            damage      = 15.f;
+            hp          = 40.f;
+            speed       = 70.f;
+            damage      = 10.f;
             attackSpeed = 0.8f;
-            reward      = 10;
+            reward      = 12;
             shape.setRadius(12.f);
             animSprite.frames = { "dust_mummy_0", "dust_mummy_1", "dust_mummy_2", "dust_mummy_3", "dust_mummy_4", "dust_mummy_5" };
             animSprite.fps    = 6.f;
@@ -49,7 +49,7 @@ void Enemy::initStats() {
             static const int   rewardArr[] = {    0,    0,   20  };
             hp          = hpArr[splitGeneration];
             damage      = dmgArr[splitGeneration];
-            speed       = 60.f;
+            speed       = 55.f;
             attackSpeed = 1.2f;      
             reward      = rewardArr[splitGeneration];
 
@@ -73,7 +73,7 @@ void Enemy::initStats() {
         case EnemyType::ShadowCrow:
             hp          = 25.f;         
             speed       = 220.f;        
-            damage      = 5.f;
+            damage      = 6.f;
             attackSpeed = 2.0f;         
             reward      = 20;          
                 shape.setRadius(6.f);
@@ -90,7 +90,7 @@ void Enemy::initStats() {
             break;
 
         case EnemyType::RustGolem:
-            hp          = 350.f;       
+            hp          = 302.f;       
             speed       = 35.f;         
             damage      = 40.f;        
             attackSpeed = 0.3f;        

@@ -25,10 +25,10 @@ void Tower::initStats() {
 
         case TowerType::WaterTower: {
             range         = 150.f;
-            damage        = 5.f;
+            damage        = 4.f;
             burstSize     = 3;
             burstDelay    = 0.12f;
-            burstCooldown = 2.0f;
+            burstCooldown = 2.3f;
             maxHp         = 150.f;
             sf::Texture& t = SpriteManager::get().getTexture("water_tower");
             sprite.setTexture(t, true);
@@ -39,7 +39,7 @@ void Tower::initStats() {
         }
         case TowerType::SunBeam: {
             range         = 250.f;
-            damage        = 45.f;
+            damage        = 55.f;
             bulletSpeed   = 350.f;
             bulletShape   = BulletShape::Beam;
             burstSize     = 1;
@@ -54,10 +54,10 @@ void Tower::initStats() {
             break;
         }
         case TowerType::TreeTower: {
-            range         = 130.f;
+            range         = 150.f;
             damage        = 10.f;
             bulletSpeed   = 200.f;
-            aoeRadius     = 60.f;
+            aoeRadius     = 55.f;
             slowFactor    = 0.4f;
             slowDuration  = 3.0f;
             burstSize     = 1;
