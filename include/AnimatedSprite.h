@@ -28,6 +28,7 @@ struct AnimatedSprite {
         }
 
     }
+    
 
     void draw(sf::RenderWindow& window, sf::Vector2f pos) {
         if (frames.empty()) return;

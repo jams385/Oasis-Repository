@@ -41,9 +41,9 @@ private:
     float           hp;
     float           maxHp;
     float           damage;       
-    float           attackSpeed;  
-    float           attackTimer;  
-    bool            attacking;   
+    float           attackSpeed;
+    float           attackTimer;
+    bool            attacking;
     int             reward;
     bool            alive;
     

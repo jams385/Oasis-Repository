@@ -10,7 +10,6 @@ void AssetLoader::loadAll() {
 
 void AssetLoader::loadSprites() {
     
-
     static const std::string MUMMY = "assets/OASIS-GRAPHICS/2-BLOOD_GOBLIN_SPRITE/";
     SpriteManager::get().loadTexture("dust_mummy_0", MUMMY + "1.png");
     SpriteManager::get().loadTexture("dust_mummy_1", MUMMY + "2.png");
@@ -50,6 +49,11 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("soldier_attack_1", SOLDIER_ATTACK + "2.png");
     SpriteManager::get().loadTexture("soldier_attack_2", SOLDIER_ATTACK + "3.png");
     SpriteManager::get().loadTexture("soldier_attack_3", SOLDIER_ATTACK + "4.png");
+
+
+    // ── Soldier Idle ──────────────────────────────────────────────────────────
+    SpriteManager::get().loadTexture("soldier_idle","assets/OASIS-GRAPHICS/IDLE.png");
+
 
     // ── Soldier Running ──────────────────────────────────────────────────────────
     static const std::string SOLDIER_RUNNING = "assets/OASIS-GRAPHICS/SOLDIER_RUNNING_SPRITE/";

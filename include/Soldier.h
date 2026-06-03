@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Enemy.h"
+#include "AnimatedSprite.h"
 
 enum class SoldierState { Inactive, Alive, Dead };
 
@@ -31,6 +32,14 @@ private:
     sf::Vector2f    targetPos;
     SoldierState    state          = SoldierState::Inactive;
 
+    AnimatedSprite  animSprite;
+    static constexpr float SPRITE_Y_OFFSET = 65.f; //for origin spawn away from cornucopia
+
+    bool isMoving   = false;
+    bool isAttacking = false;
+    bool facingLeft = false;
+
+    
     float           hp             = 0.f;
     float           maxHp          = 50.f;
     float           moveSpeed      = 80.f;
@@ -39,8 +48,9 @@ private:
     float           attackTimer    = 0.f;
     float           attackCooldown = 1.0f;
     float           respawnTimer   = 0.f;
+    float           attackAnimTimer      = 0.f;
 
-    sf::CircleShape shape;
+    //sf::CircleShape shape;
     sf::CircleShape patrolCircle;
 
     void drawHpBar(sf::RenderWindow& window);

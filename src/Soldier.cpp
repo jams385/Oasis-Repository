@@ -6,11 +6,17 @@ Soldier::Soldier()
     , position(0.f, 0.f)
     , targetPos(0.f, 0.f)
 {
-    shape.setRadius(6.f);
-    shape.setOrigin(6.f, 6.f);
-    shape.setFillColor(sf::Color(220, 180, 60));
-    shape.setOutlineColor(sf::Color(255, 230, 100));
-    shape.setOutlineThickness(1.5f);
+    animSprite.frames = { "soldier_running_0", "soldier_running_1", "soldier_running_2", "soldier_running_3", "soldier_running_4", "soldier_running_5", "soldier_running_6", "soldier_running_7"}; 
+    animSprite.fps = 8.f; 
+        { 
+            sf::Texture& t = SpriteManager::get().getTexture("soldier_running_0"); 
+            sf::Vector2u sz = t.getSize(); animSprite.sprite.setTexture(t, true); 
+            animSprite.sprite.setOrigin(sz.x / 2.f, sz.y * 0.85f); 
+            animSprite.sprite.setScale(1.f, 1.f); 
+        }
+
+    
+
 
     patrolCircle.setRadius(PATROL_RADIUS);
     patrolCircle.setOrigin(PATROL_RADIUS, PATROL_RADIUS);
@@ -25,7 +31,6 @@ void Soldier::activate(sf::Vector2f homePos) {
     targetPos = homePos;
     hp        = maxHp;
     state     = SoldierState::Alive;
-    shape.setPosition(position);
     patrolCircle.setPosition(home);
 }
 
@@ -42,6 +47,70 @@ void Soldier::orderMoveTo(sf::Vector2f worldPos) {
     targetPos = home + diff;
 }
 
+void setIdleAnimation(AnimatedSprite& animSprite)
+{
+    if (!animSprite.frames.empty() &&
+        animSprite.frames[0] == "soldier_idle")
+        return;
+
+    animSprite.frames = { "soldier_idle" };
+
+    animSprite.frameIndex = 0;
+    animSprite.fps = 1.f;
+
+    animSprite.sprite.setTexture(
+        SpriteManager::get().getTexture("soldier_idle"),
+        true
+    );
+}
+
+void setAttackAnimation(AnimatedSprite& animSprite)
+{
+    if (!animSprite.frames.empty() &&
+        animSprite.frames[0] == "soldier_attack_0")
+        return;
+
+    animSprite.frames = {
+        "soldier_attack_0",
+        "soldier_attack_1",
+        "soldier_attack_2",
+        "soldier_attack_3"
+    };
+
+    animSprite.frameIndex = 0;
+    animSprite.fps = 4.f;
+
+    animSprite.sprite.setTexture(
+        SpriteManager::get().getTexture("soldier_attack_0"),
+        true
+    );
+}
+void setRunningAnimation(AnimatedSprite& animSprite)
+{
+    if (!animSprite.frames.empty() &&
+        animSprite.frames[0] == "soldier_running_0")
+        return;
+
+    animSprite.frames = {
+        "soldier_running_0",
+        "soldier_running_1",
+        "soldier_running_2",
+        "soldier_running_3",
+        "soldier_running_4",
+        "soldier_running_5",
+        "soldier_running_6",
+        "soldier_running_7"
+    };
+
+    animSprite.frameIndex = 0;
+    animSprite.fps = 8.f;
+
+    animSprite.sprite.setTexture(
+        SpriteManager::get().getTexture("soldier_running_0"),
+        true
+    );
+}
+
 void Soldier::update(float dt, std::vector<Enemy>& enemies) {
     if (state == SoldierState::Inactive) return;
 
@@ -52,7 +121,6 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
             targetPos = home;
             hp        = maxHp;
             state     = SoldierState::Alive;
-            shape.setPosition(position);
         }
         return;
     }
@@ -60,13 +128,27 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
     // Move toward ordered position
     sf::Vector2f diff = targetPos - position;
     float d = dist(targetPos, position);
-    if (d > 2.f) {
-        position += diff / d * moveSpeed * dt;
-        shape.setPosition(position);
-    }
+    isMoving = false;
+
+if (d > 2.f) {
+    isMoving = true;
+    position += diff / d * moveSpeed * dt;
+    if (diff.x < 0.f)
+        facingLeft = true;
+    else
+        facingLeft = false;
+    if (!isAttacking)
+    setRunningAnimation(animSprite);
+}
 
     // Auto-attack nearest enemy in range
     if (attackTimer > 0.f) attackTimer -= dt;
+    if (attackAnimTimer > 0.f){
+        attackAnimTimer -= dt;
+        isAttacking = true;}
+    else
+    {isAttacking = false;}
+
     if (attackTimer <= 0.f) {
         Enemy* target  = nullptr;
         float  minDist = attackRange;
@@ -76,10 +158,16 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
             if (d_dist < minDist) { minDist = d_dist; target = &e; }
         }
         if (target) {
+            isAttacking = true;
+            attackAnimTimer = 0.4f;
+            setAttackAnimation(animSprite);
             target->takeDamage(damage);
             attackTimer = attackCooldown;
         }
     }
+
+    if (!isMoving && !isAttacking)
+    {setIdleAnimation(animSprite);}
 
     // Take passive damage when enemies are in contact
     for (auto& e : enemies) {
@@ -92,6 +180,14 @@ void Soldier::update(float dt, std::vector<Enemy>& enemies) {
         state        = SoldierState::Dead;
         respawnTimer = RESPAWN_TIME;
     }
+
+    animSprite.update(dt);
+    animSprite.sprite.setPosition(position);
+
+    if (facingLeft)
+    animSprite.sprite.setScale(-1.f, 1.f);
+    else
+    animSprite.sprite.setScale(1.f, 1.f);
 }
 
 void Soldier::draw(sf::RenderWindow& window) {
@@ -99,17 +195,14 @@ void Soldier::draw(sf::RenderWindow& window) {
 
     if (state == SoldierState::Dead) {
         // Ghost to show respawn is pending
-        sf::CircleShape ghost(6.f);
-        ghost.setOrigin(6.f, 6.f);
-        ghost.setPosition(home);
-        ghost.setFillColor(sf::Color(220, 180, 60, 50));
-        ghost.setOutlineColor(sf::Color(255, 230, 100, 70));
-        ghost.setOutlineThickness(1.5f);
-        window.draw(ghost);
+        animSprite.sprite.setPosition(home.x, home.y + SPRITE_Y_OFFSET);
+        animSprite.sprite.setColor(sf::Color(255,255,255,80));
+        window.draw(animSprite.sprite);
+        animSprite.sprite.setColor(sf::Color::White);
         return;
     }
 
-    window.draw(shape);
+    window.draw(animSprite.sprite);
     drawHpBar(window);
 }
 
