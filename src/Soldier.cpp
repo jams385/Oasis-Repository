@@ -11,7 +11,7 @@ Soldier::Soldier()
         { 
             sf::Texture& t = SpriteManager::get().getTexture("soldier_running_0"); 
             sf::Vector2u sz = t.getSize(); animSprite.sprite.setTexture(t, true); 
-            animSprite.sprite.setOrigin(sz.x / 2.f, sz.y * 0.85f); 
+            animSprite.sprite.setOrigin(sz.x / 2.f, sz.y); 
             animSprite.sprite.setScale(1.f, 1.f); 
         }
 
