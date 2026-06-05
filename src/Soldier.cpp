@@ -15,9 +15,6 @@ Soldier::Soldier()
             animSprite.sprite.setScale(1.f, 1.f); 
         }
 
-    
-
-
     patrolCircle.setRadius(PATROL_RADIUS);
     patrolCircle.setOrigin(PATROL_RADIUS, PATROL_RADIUS);
     patrolCircle.setFillColor(sf::Color(255, 215, 0, 15));

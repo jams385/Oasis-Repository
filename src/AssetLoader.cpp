@@ -43,7 +43,7 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("spore_puff_4", SPORE_PUFF + "5.png");
     SpriteManager::get().loadTexture("spore_puff_5", SPORE_PUFF + "6.png");
 
-    // ── Soldier Attack ───────────────────────────────────────────────────────────
+   
     static const std::string SOLDIER_ATTACK = "assets/OASIS-GRAPHICS/SOLDIER_ATTACK_SPRITE/";
     SpriteManager::get().loadTexture("soldier_attack_0", SOLDIER_ATTACK + "1.png");
     SpriteManager::get().loadTexture("soldier_attack_1", SOLDIER_ATTACK + "2.png");
@@ -51,11 +51,11 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("soldier_attack_3", SOLDIER_ATTACK + "4.png");
 
 
-    // ── Soldier Idle ──────────────────────────────────────────────────────────
+  
     SpriteManager::get().loadTexture("soldier_idle","assets/OASIS-GRAPHICS/IDLE.png");
 
 
-    // ── Soldier Running ──────────────────────────────────────────────────────────
+
     static const std::string SOLDIER_RUNNING = "assets/OASIS-GRAPHICS/SOLDIER_RUNNING_SPRITE/";
     SpriteManager::get().loadTexture("soldier_running_0", SOLDIER_RUNNING + "1.png");
     SpriteManager::get().loadTexture("soldier_running_1", SOLDIER_RUNNING + "2.png");
@@ -66,13 +66,13 @@ void AssetLoader::loadSprites() {
     SpriteManager::get().loadTexture("soldier_running_6", SOLDIER_RUNNING + "7.png");
     SpriteManager::get().loadTexture("soldier_running_7", SOLDIER_RUNNING + "8.png");
 
-    // ── Towers ───────────────────────────────────────────────────────────────────
+    
     SpriteManager::get().loadTexture("water_tower",     "assets/OASIS-GRAPHICS/WATER_TOWER_2.png");
     SpriteManager::get().loadTexture("sunbeam_tower",   "assets/OASIS-GRAPHICS/SUN_BEAM_TOWER_2.png");
     SpriteManager::get().loadTexture("tree_tower",      "assets/OASIS-GRAPHICS/TREE_TOWER.png");
     SpriteManager::get().loadTexture("water_well",      "assets/OASIS-GRAPHICS/WATER_WELL.png");
 
-    // ── Cornucopia ───────────────────────────────────────────────────────────────
+    
     SpriteManager::get().loadTexture("cornucopia_main", "assets/OASIS-GRAPHICS/CORNUCOPIA_MAIN.png");
     SpriteManager::get().loadTexture("cornucopia_mini", "assets/OASIS-GRAPHICS/CORNUCOPIA_MINI.png");
 }
